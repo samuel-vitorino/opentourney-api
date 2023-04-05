@@ -11,6 +11,9 @@ const Paths = {
     Base: '/auth',
     Login: '/login',
     Logout: '/logout',
+    SteamConnect: '/steam/connect',
+    SteamDisconnect: '/steam/disconnect',
+    SteamCallback: '/steam/return'
   },
   Users: {
     Base: '/users',

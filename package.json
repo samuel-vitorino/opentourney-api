@@ -43,6 +43,8 @@
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
     "node-pg-migrate": "^6.2.2",
+    "passport": "^0.6.0",
+    "passport-steam": "^1.0.17",
     "pg": "^8.10.0",
     "ts-command-line-args": "^2.4.2"
   },
@@ -58,6 +60,8 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/morgan": "^1.9.4",
     "@types/node": "^18.15.11",
+    "@types/passport": "^1.0.12",
+    "@types/passport-steam": "^1.0.1",
     "@types/pg": "^8.6.6",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.57.0",

@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import jetValidator from 'jet-validator';
+import passport from 'passport';
 
 import developerMw from './middleware/developerMw';
+import userDevMw from './middleware/userDevMw';
 import userMw from './middleware/userMw';
 import Paths from './constants/Paths';
 import User from '@src/models/User';
 import AuthRoutes from './AuthRoutes';
 import UserRoutes from './UserRoutes';
-
+import SteamRoutes from './SteamRoutes';
 
 // **** Variables **** //
 
@@ -32,9 +34,18 @@ authRouter.get(
   AuthRoutes.logout,
 );
 
+// initiate Steam login
+authRouter.get(Paths.Auth.SteamConnect, [userMw, passport.authenticate('steam')]);
+
+// handle Steam login callback
+authRouter.get(Paths.Auth.SteamCallback, passport.authenticate('steam', {
+  session: false,
+  failureRedirect: "http://localhost:5173/settings",
+  passReqToCallback: true
+}), SteamRoutes.steamCallback)
+
 // Add AuthRouter
 apiRouter.use(Paths.Auth.Base, authRouter);
-
 
 // ** Add UserRouter ** //
 
@@ -57,7 +68,7 @@ userRouter.post(
 // Update one user
 userRouter.put(
   Paths.Users.Base,
-  [validate(['user', User.isUser]), userMw],
+  [validate(['user', User.isUser]), userDevMw],
   UserRoutes.update,
 );
 

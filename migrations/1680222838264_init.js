@@ -6,7 +6,7 @@ exports.up = pgm => {
         pwd: { type: 'varchar(200)', notNull: true },
         role: { type: 'smallint', notNull: true },
         avatar: { type: 'varchar(256)' },
-        steamID: { type: 'varchar(17)' },
+        steamid: { type: 'varchar(17)' },
         createdAt: {
             type: 'timestamp',
             notNull: true,

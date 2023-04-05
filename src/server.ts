@@ -8,6 +8,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import express, { Request, Response, NextFunction } from 'express';
 import logger from 'jet-logger';
+import passport from 'passport';
+import SteamStrategy from 'passport-steam';
 
 import 'express-async-errors';
 
@@ -24,7 +26,6 @@ import { RouteError } from '@src/other/classes';
 // **** Variables **** //
 
 const app = express();
-
 
 // **** Setup **** //
 
@@ -43,6 +44,16 @@ if (EnvVars.NodeEnv === NodeEnvs.Dev) {
 if (EnvVars.NodeEnv === NodeEnvs.Production) {
   app.use(helmet());
 }
+
+//Passport
+passport.use(new SteamStrategy.Strategy({
+    returnURL: 'http://localhost:3000/api/auth/steam/return',
+    realm: 'http://localhost:3000/',
+    apiKey: EnvVars.Steam.ApiKey,
+}, function(identifier: string, profile: Object, done: passport.DoneCallback) {
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", identifier);
+    done(null, profile);
+}));
 
 // Add APIs, must be after middleware
 app.use(Paths.Base, BaseRouter);

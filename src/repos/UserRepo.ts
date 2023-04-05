@@ -49,7 +49,7 @@ async function add(user: IUser): Promise<void> {
  * Update a user.
  */
 async function update(user: IUser): Promise<void> {
-  const sql = 'UPDATE users SET name = $1, email = $2, pwd = $3, role = $4 WHERE id = $4';
+  const sql = 'UPDATE users SET name = $1, email = $2, pwd = $3, role = $4 WHERE id = $5';
   const values = [user.name, user.email, user.pwd, user.role, user.id];
   await DB.query(sql, values);
 }
@@ -63,6 +63,21 @@ async function delete_(id: number): Promise<void> {
   await DB.query(sql, values);
 }
 
+async function addSteamID(userId: number, steamID: string) { 
+  let vals = [steamID];
+ 
+  const sql_check = "SELECT EXISTS(SELECT 1 FROM users WHERE steamid = $1)";
+  const rows = await DB.query(sql_check, vals);
+
+  if (rows[0].exists) {
+    return null;
+  }
+
+  const sql_update = "UPDATE users SET steamid = $1 WHERE id = $2 RETURNING *";
+  const values = [steamID, userId];
+  return (await DB.query(sql_update, values)).length > 0;
+}
+
 
 // **** Export default **** //
 
@@ -73,4 +88,5 @@ export default {
   add,
   update,
   delete: delete_,
+  addSteamID
 } as const;

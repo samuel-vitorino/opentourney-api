@@ -27,5 +27,8 @@ export default {
   },
   CORS: {
     origins: process.env.CORS_ORIGINS ?? ''
+  },
+  Steam: {
+    ApiKey: process.env.STEAM_API_KEY ?? ''
   }
 } as const;

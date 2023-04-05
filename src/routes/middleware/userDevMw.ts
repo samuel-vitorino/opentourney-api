@@ -1,5 +1,5 @@
 /**
- * Middleware to verify if the requester is a user.
+ * Middleware to verify if the user retrieving the info is the owner or is admin.
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -26,17 +26,22 @@ type TSessionData = ISessionUser & JwtPayload;
 /**
  * See note at beginning of file.
  */
-async function userMw(
+async function userDevMw(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   // Get session data
-  try {
-    const sessionData = await SessionUtil.getSessionData<TSessionData>(req);
+  const sessionData = await SessionUtil.getSessionData<TSessionData>(req);
+  // Set session data to locals
+  if (
+    typeof sessionData === 'object' &&
+    (sessionData?.id === +req.params.id || sessionData?.role === UserRoles.Developer) 
+  ) {
     res.locals.sessionUser = sessionData;
     return next();
-  } catch (error) {
+  // Return an unauth error if user is not the owner of the data
+  } else {
     return res
       .status(HttpStatusCodes.UNAUTHORIZED)
       .json({ error: USER_UNAUTHORIZED_ERR });
@@ -46,4 +51,4 @@ async function userMw(
 
 // **** Export Default **** //
 
-export default userMw;
+export default userDevMw;
