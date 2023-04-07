@@ -18,6 +18,7 @@ const Paths = {
   Users: {
     Base: '/users',
     GetOne: '/users/:id',
+    LoggedIn: '/users/me'
   },
 };
 

@@ -23,10 +23,6 @@ export interface IUser {
 
 export interface ISessionUser {
   id: number;
-  email: string;
-  name: string;
-  avatar: string;
-  role: IUser['role'];
 }
 
 

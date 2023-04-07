@@ -58,6 +58,11 @@ userRouter.get(
   UserRoutes.getAll,
 );
 
+userRouter.get(
+  Paths.Users.LoggedIn,
+  UserRoutes.getLoggedIn
+);
+
 // Add one user
 userRouter.post(
   Paths.Users.Base,

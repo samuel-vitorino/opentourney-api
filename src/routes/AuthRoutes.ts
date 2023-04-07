@@ -24,16 +24,18 @@ async function login(req: IReq<ILoginReq>, res: IRes) {
   const user = await AuthService.login(email, pwd);
   // Setup Cookie
   const userDetails = {
-    id: user.id,
-    steamID: user.steamID,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    avatar: user.avatar,
+    id: user.id
   }
   await SessionUtil.addSessionData(res, userDetails);
   // Return
-  return res.status(HttpStatusCodes.OK).json(userDetails);
+  return res.status(HttpStatusCodes.OK).json({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatar: user.avatar,
+    role: user.role,
+    steamID: user.steamID
+  });
 }
 
 /**

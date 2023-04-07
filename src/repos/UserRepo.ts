@@ -17,6 +17,18 @@ async function getOne(email: string): Promise<IUser | null> {
   return <IUser>rows[0];
 }
 
+async function getOneById(id: number): Promise<IUser | null> {
+  const sql = 'SELECT * FROM users WHERE id = $1';
+  const rows = await DB.query(sql, [id]);
+  if (rows.length === 0) {
+    return null;
+  }
+
+  delete rows[0]['pwd'];
+
+  return <IUser>rows[0];
+}
+
 /**
  * See if a user with the given id exists.
  */
@@ -83,6 +95,7 @@ async function addSteamID(userId: number, steamID: string) {
 
 export default {
   getOne,
+  getOneById,
   persists,
   getAll,
   add,

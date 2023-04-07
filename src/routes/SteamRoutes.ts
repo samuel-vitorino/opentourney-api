@@ -16,13 +16,14 @@ async function steamCallback(req: IReq, res: IRes) {
         const userData = await SessionUtil.getSessionData<ISessionUser>(req);
         const success = await SteamService.connectSteamID((<ISessionUser>userData).id, (<SteamUserDetails>req.user)._json.steamid);
         
-        if (success) {
-            res.redirect("http://localhost:5173/settings");
+        if (!success) {
+            throw new Error()
         }
+        
+        return res.redirect("http://localhost:5173/settings");
 
-        throw new Error()
     } catch (error) {
-        res.redirect("http://localhost:5173/")
+        return res.redirect("http://localhost:5173/")
     }
 }
 

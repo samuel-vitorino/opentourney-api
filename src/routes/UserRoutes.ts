@@ -1,8 +1,10 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
 import UserService from '@src/services/UserService';
-import { IUser } from '@src/models/User';
+import User, { IUser } from '@src/models/User';
 import { IReq, IRes } from './types/express/misc';
+import SessionUtil from '@src/util/SessionUtil';
+import { ISessionUser } from '@src/models/User';
 
 
 // **** Functions **** //
@@ -15,7 +17,22 @@ async function getAll(_: IReq, res: IRes) {
   return res.status(HttpStatusCodes.OK).json({ users });
 }
 
-/**
+async function getLoggedIn(req: IReq, res: IRes) {
+  try {
+    const userData = <ISessionUser>(await SessionUtil.getSessionData<ISessionUser>(req));
+    const user = await UserService.getOne(userData.id);
+
+    if (user === null) {
+      throw new Error();
+    }
+
+    return res.json(user);
+  } catch(error) {
+    return res.status(HttpStatusCodes.UNAUTHORIZED).end();
+  }
+}
+
+  /**
  * Add one user.
  */
 async function add(req: IReq<{user: IUser}>, res: IRes) {
@@ -47,6 +64,7 @@ async function delete_(req: IReq, res: IRes) {
 
 export default {
   getAll,
+  getLoggedIn,
   add,
   update,
   delete: delete_,
