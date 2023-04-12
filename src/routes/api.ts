@@ -63,6 +63,11 @@ userRouter.get(
   UserRoutes.getLoggedIn
 );
 
+userRouter.get(
+  Paths.Users.GetOne,
+  UserRoutes.getOne,
+);
+
 // Add one user
 userRouter.post(
   Paths.Users.Base,

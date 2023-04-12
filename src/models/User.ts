@@ -16,7 +16,7 @@ export interface IUser {
   name: string;
   email: string;
   avatar?: string;
-  steamID?: string;
+  steamid?: string;
   pwd?: string;
   role?: UserRoles;
 }
@@ -37,7 +37,7 @@ function new_(
   role?: UserRoles,
   pwd?: string,
   avatar?: string,
-  steamID?: string,
+  steamid?: string,
   id?: number, // id last cause usually set by db
 ): IUser {
   return {
@@ -47,7 +47,7 @@ function new_(
     role: (role ?? UserRoles.Standard),
     pwd: (pwd ?? ''),
     avatar: (avatar ?? ''),
-    steamID: (steamID ?? '')
+    steamid: (steamid ?? '')
   };
 }
 
@@ -61,7 +61,7 @@ function from(param: object): IUser {
   }
   // Get user instance
   const p = param as IUser;
-  return new_(p.name, p.email, p.role, p.pwd, p.avatar, p.steamID, p.id);
+  return new_(p.name, p.email, p.role, p.pwd, p.avatar, p.steamid, p.id);
 }
 
 /**

@@ -51,7 +51,6 @@ passport.use(new SteamStrategy.Strategy({
     realm: 'http://localhost:3000/',
     apiKey: EnvVars.Steam.ApiKey,
 }, function(identifier: string, profile: Object, done: passport.DoneCallback) {
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", identifier);
     done(null, profile);
 }));
 

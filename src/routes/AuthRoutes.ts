@@ -34,7 +34,7 @@ async function login(req: IReq<ILoginReq>, res: IRes) {
     name: user.name,
     avatar: user.avatar,
     role: user.role,
-    steamID: user.steamID
+    steamid: user.steamid
   });
 }
 

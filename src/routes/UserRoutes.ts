@@ -17,6 +17,15 @@ async function getAll(_: IReq, res: IRes) {
   return res.status(HttpStatusCodes.OK).json({ users });
 }
 
+async function getOne(req: IReq, res: IRes) {
+  try {
+    const user = await UserService.getOne(+req.params.id);
+    return res.status(HttpStatusCodes.OK).json({ user });
+  } catch(error) {
+    return res.status(HttpStatusCodes.BAD_REQUEST);
+  }
+}
+
 async function getLoggedIn(req: IReq, res: IRes) {
   try {
     const userData = <ISessionUser>(await SessionUtil.getSessionData<ISessionUser>(req));
@@ -64,6 +73,7 @@ async function delete_(req: IReq, res: IRes) {
 
 export default {
   getAll,
+  getOne,
   getLoggedIn,
   add,
   update,
