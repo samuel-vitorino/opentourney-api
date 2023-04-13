@@ -37,13 +37,15 @@ app.use(cookieParser(EnvVars.CookieProps.Secret));
 // Show routes called in console during development
 if (EnvVars.NodeEnv === NodeEnvs.Dev) {
   app.use(morgan('dev'));
-  app.use(cors({credentials: true, origin: EnvVars.CORS.origins}));
 }
 
 // Security
 if (EnvVars.NodeEnv === NodeEnvs.Production) {
   app.use(helmet());
 }
+
+// CORS
+app.use(cors({credentials: true, origin: EnvVars.CORS.origins}));
 
 //Passport
 passport.use(new SteamStrategy.Strategy({
