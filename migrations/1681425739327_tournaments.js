@@ -1,12 +1,15 @@
 exports.up = pgm => {
-    pgm.createTable('users', {
+    pgm.createTable('tournaments', {
         id: 'id',
         name: { type: 'varchar(1000)', notNull: true },
-        email: { type: 'varchar(200)', notNull: true, unique: true },
-        pwd: { type: 'varchar(200)', notNull: true },
-        role: { type: 'smallint', notNull: true },
         avatar: { type: 'varchar(1000)' },
-        steamid: { type: 'varchar(17)' },
+        admin: {
+            type: 'integer',
+            notNull: true,
+            references: '"users"',
+            onDelete: 'cascade',
+        },
+        max_teams: { type: 'smallint', notNull: true },
         createdAt: {
             type: 'timestamp',
             notNull: true,

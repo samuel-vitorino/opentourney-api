@@ -1,7 +1,7 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
 import UserService from '@src/services/UserService';
-import User, { IUser } from '@src/models/User';
+import { IUser } from '@src/models/User';
 import { IReq, IRes } from './types/express/misc';
 import SessionUtil from '@src/util/SessionUtil';
 import { ISessionUser } from '@src/models/User';

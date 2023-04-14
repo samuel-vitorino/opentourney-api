@@ -20,6 +20,18 @@ const Paths = {
     GetOne: '/users/:id',
     LoggedIn: '/users/me'
   },
+  Tournaments: {
+    Base: '/tournaments',
+    GetOne: '/tournaments/:id'
+  },
+  Teams: {
+    Base: '/teams',
+    GetOne: '/teams/:id'
+  },
+  Matches: {
+    Base: '/matches',
+    GetOne: '/matches/:id'
+  },
 };
 
 

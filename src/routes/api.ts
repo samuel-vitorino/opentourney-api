@@ -10,6 +10,12 @@ import User from '@src/models/User';
 import AuthRoutes from './AuthRoutes';
 import UserRoutes from './UserRoutes';
 import SteamRoutes from './SteamRoutes';
+import TournamentRoutes from './TournamentRoutes';
+import TeamRoutes from './TeamRoutes';
+import MatchRoutes from './MatchRoutes';
+import Tournament from '@src/models/Tournament';
+import Team from '@src/models/Team';
+import Match from '@src/models/Match';
 
 // **** Variables **** //
 
@@ -77,14 +83,14 @@ userRouter.post(
 
 // Update one user
 userRouter.put(
-  Paths.Users.Base,
+  Paths.Users.GetOne,
   [validate(['user', User.isUser]), userDevMw],
   UserRoutes.update,
 );
 
 // Delete one user
 userRouter.delete(
-  Paths.Users.Base,
+  Paths.Users.GetOne,
   [validate(['id', 'number', 'params']), developerMw],
   UserRoutes.delete,
 );
@@ -92,6 +98,123 @@ userRouter.delete(
 // Add UserRouter
 apiRouter.use(userRouter);
 
+// ** Add TournamentRouter ** //
+
+const tournamentRouter = Router();
+
+// Get all tournaments
+tournamentRouter.get(
+  Paths.Tournaments.Base,
+  //developerMw,
+  TournamentRoutes.getAll,
+);
+
+tournamentRouter.get(
+  Paths.Tournaments.GetOne,
+  TournamentRoutes.getOne,
+);
+
+// Add one tournament
+tournamentRouter.post(
+  Paths.Tournaments.Base,
+  validate(['tournament', Tournament.isTournament]),
+  TournamentRoutes.add,
+);
+
+// Update one tournament
+tournamentRouter.put(
+  Paths.Tournaments.GetOne,
+  [validate(['tournament', Tournament.isTournament]), userDevMw],
+  TournamentRoutes.update,
+);
+
+// Delete one tournament
+tournamentRouter.delete(
+  Paths.Tournaments.GetOne,
+  [validate(['id', 'number', 'params']), userDevMw],
+  TournamentRoutes.delete,
+);
+
+// Add TournamentRouter
+apiRouter.use(tournamentRouter);
+
+// ** Add TeamRouter ** //
+
+const teamRouter = Router();
+
+// Get all teams
+teamRouter.get(
+  Paths.Teams.Base,
+  TeamRoutes.getAll,
+);
+
+teamRouter.get(
+  Paths.Teams.GetOne,
+  TeamRoutes.getOne,
+);
+
+// Add one team
+teamRouter.post(
+  Paths.Teams.Base,
+  validate(['team', Team.isTeam]),
+  TeamRoutes.add,
+);
+
+// Update one team
+teamRouter.put(
+  Paths.Teams.GetOne,
+  [validate(['team', Team.isTeam])],
+  TournamentRoutes.update,
+);
+
+// Delete one team
+teamRouter.delete(
+  Paths.Teams.GetOne,
+  [validate(['id', 'number', 'params'])],
+  TeamRoutes.delete,
+);
+
+// Add TeamRouter
+apiRouter.use(teamRouter);
+
+// ** Add MatchRouter ** //
+
+const matchRouter = Router();
+
+// Get all matches
+matchRouter.get(
+  Paths.Matches.Base,
+  MatchRoutes.getAll,
+);
+
+matchRouter.get(
+  Paths.Matches.GetOne,
+  MatchRoutes.getOne,
+);
+
+// Add one match
+matchRouter.post(
+  Paths.Matches.Base,
+  validate(['match', Match.isMatch]),
+  MatchRoutes.add,
+);
+
+// Update one match
+matchRouter.put(
+  Paths.Matches.GetOne,
+  [validate(['match', Match.isMatch])],
+  MatchRoutes.update,
+);
+
+// Delete one match
+matchRouter.delete(
+  Paths.Matches.GetOne,
+  [validate(['id', 'number', 'params'])],
+  MatchRoutes.delete,
+);
+
+// Add MatchRouter
+apiRouter.use(matchRouter);
 
 // **** Export default **** //
 
