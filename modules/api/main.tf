@@ -33,5 +33,5 @@ resource "google_compute_instance" "api" {
     }
   }
 
-  tags = ["${local.network}-api"]
+  tags = ["api-${local.network}-server"]
 }
