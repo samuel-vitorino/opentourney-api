@@ -3,7 +3,7 @@ module "vpc" {
   version = "3.3.0"
 
   project_id   = "${var.project}"
-  network_name = "${var.env}"
+  network_name = "api-${var.env}"
 
   subnets = [
     {
@@ -14,6 +14,6 @@ module "vpc" {
   ]
 
   secondary_ranges = {
-    "${var.env}-subnet-01" = []
+    "api-${var.env}-subnet-01" = []
   }
 }

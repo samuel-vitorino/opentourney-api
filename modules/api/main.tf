@@ -3,7 +3,7 @@ locals {
 }
 
 resource "google_secret_manager_secret_version" "secret-version" {
-  secret = "production_env"
+  secret = "projects/${var.project}/secrets/production_env/versions/latest"
 
   secret_data = "secret-data"
 }
