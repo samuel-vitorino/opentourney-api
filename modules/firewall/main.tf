@@ -4,7 +4,7 @@ locals {
 
 resource "google_compute_firewall" "allow-http" {
   name    = "${local.network}-allow-http"
-  network = "api${local.network}"
+  network = "${local.network}"
   project = "${var.project}"
 
   allow {
