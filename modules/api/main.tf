@@ -2,17 +2,8 @@ locals {
   network = "${element(split("-", var.subnet), 0)}"
 }
 
-resource "google_secret_manager_secret" "secret" {
-  secret_id = "production_env"
-
-  replication {
-    automatic = true
-  }
-}
-
-
 resource "google_secret_manager_secret_version" "secret-version" {
-  secret = google_secret_manager_secret.secret.id
+  secret = "production_env"
 
   secret_data = "secret-data"
 }
