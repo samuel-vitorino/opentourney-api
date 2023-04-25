@@ -2,7 +2,7 @@ locals {
   network = "${element(split("-", var.subnet), 0)}"
 }
 
-resource "google_secret_manager_secret_version" "secret-version" {
+data "google_secret_manager_secret_version" "secret-version" {
   secret = "projects/${var.project}/secrets/production_env"
 }
 
