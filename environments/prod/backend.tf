@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
     bucket = "opentourney-384222-tfstate"
-    prefix = "env/prod"
+    prefix = "api/env/prod"
   }
 }
