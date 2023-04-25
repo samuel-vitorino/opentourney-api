@@ -15,11 +15,11 @@ module "api-prod-vpc" {
 module "api-prod-server" {
   source  = "../../modules/api"
   project = "${var.project}"
-  subnet  = "${module.prod-vpc.subnet}"
+  subnet  = "${module.api-prod-vpc.subnet}"
 }
 
 module "api-prod-firewall" {
   source  = "../../modules/firewall"
   project = "${var.project}"
-  subnet  = "${module.prod-vpc.subnet}"
+  subnet  = "${module.api-prod-vpc.subnet}"
 }
