@@ -12,6 +12,6 @@ resource "google_compute_firewall" "allow-http" {
     ports    = ["80"]
   }
 
-  target_tags   = ["${local.network}-api"]
+  target_tags   = ["api-${local.network}"]
   source_ranges = ["0.0.0.0/0"]
 }
