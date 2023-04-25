@@ -12,7 +12,7 @@ module "api-dev-vpc" {
   env     = "${local.env}"
 }
 
-module "api-dev-api" {
+module "api-dev-server" {
   source  = "../../modules/api"
   project = "${var.project}"
   subnet  = "${module.dev-vpc.subnet}"

@@ -6,19 +6,19 @@ provider "google" {
   project = "${var.project}"
 }
 
-module "prod-vpc" {
+module "api-prod-vpc" {
   source  = "../../modules/vpc"
   project = "${var.project}"
   env     = "${local.env}"
 }
 
-module "prod-api" {
+module "api-prod-server" {
   source  = "../../modules/api"
   project = "${var.project}"
   subnet  = "${module.prod-vpc.subnet}"
 }
 
-module "prod-firewall" {
+module "api-prod-firewall" {
   source  = "../../modules/firewall"
   project = "${var.project}"
   subnet  = "${module.prod-vpc.subnet}"
