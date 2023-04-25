@@ -11,7 +11,7 @@ resource "google_secret_manager_secret_version" "secret-version" {
 resource "google_compute_instance" "api" {
   project      = "${var.project}"
   zone         = "us-central1-a"
-  name         = "${local.network}-api-instance"
+  name         = "${local.network}-server-instance"
   machine_type = "f1-micro"
 
   metadata = {
@@ -33,5 +33,5 @@ resource "google_compute_instance" "api" {
     }
   }
 
-  tags = ["api-${local.network}-server"]
+  tags = ["api_${local.network}-server"]
 }

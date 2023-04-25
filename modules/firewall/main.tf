@@ -4,7 +4,7 @@ locals {
 
 resource "google_compute_firewall" "allow-http" {
   name    = "${local.network}-allow-http"
-  network = "api-${local.network}"
+  network = "api_${local.network}"
   project = "${var.project}"
 
   allow {
@@ -12,6 +12,6 @@ resource "google_compute_firewall" "allow-http" {
     ports    = ["3000"]
   }
 
-  target_tags   = ["api-${local.network}-server"]
+  target_tags   = ["api_${local.network}-server"]
   source_ranges = ["0.0.0.0/0"]
 }
