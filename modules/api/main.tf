@@ -4,8 +4,6 @@ locals {
 
 resource "google_secret_manager_secret_version" "secret-version" {
   secret = "projects/${var.project}/secrets/production_env"
-
-  secret_data = "secret-data"
 }
 
 resource "google_compute_instance" "api" {
