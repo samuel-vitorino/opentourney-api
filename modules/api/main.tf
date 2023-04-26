@@ -12,7 +12,7 @@ resource "google_compute_instance" "api" {
   name         = "${local.network}-server-instance"
   machine_type = "f1-micro"
 
-  metadata_startup_script = "echo ${data.google_secret_manager_secret_version.secret-version.secret_data} > /.env && docker run --env-file=/.env -p 3000:3000 gcr.io/${var.project}/opentourney-api:latest"
+  metadata_startup_script = "echo ${data.google_secret_manager_secret_version.secret-version.secret_data} > /envfile.list && docker run --env-file=/envfile.list -p 3000:3000 gcr.io/${var.project}/opentourney-api:latest"
 
   boot_disk {
     initialize_params {
