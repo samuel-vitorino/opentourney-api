@@ -9,7 +9,7 @@ resource "google_compute_firewall" "allow-http" {
 
   allow {
     protocol = "tcp"
-    ports    = ["3000"]
+    ports    = ["3000", "22"]
   }
 
   target_tags   = ["api${local.network}-server"]
