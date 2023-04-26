@@ -3,7 +3,16 @@ locals {
 }
 
 data "google_secret_manager_secret_version" "secret-version" {
-  secret = "projects/${var.project}/secrets/production_env"
+  secret = "projects/${var.project}/secrets/${local.network}_env"
+}
+
+data "google_container_registry_image" "api-image" {
+  name = "opentourney-api"
+}
+
+data "google_compute_address" "static-ip-address" {
+  name = "api-opentourney-${local.network}"
+  region = "us-central1"
 }
 
 resource "google_compute_instance" "api" {
@@ -12,7 +21,7 @@ resource "google_compute_instance" "api" {
   name         = "${local.network}-server-instance"
   machine_type = "f1-micro"
 
-  metadata_startup_script = "sudo mkdir /var/envs && echo '${data.google_secret_manager_secret_version.secret-version.secret_data}' | sudo tee /var/envs/.env && docker run --env-file=/var/envs/.env -p 3000:3000 gcr.io/${var.project}/opentourney-api:latest"
+  metadata_startup_script = "sudo mkdir /var/envs && echo '${data.google_secret_manager_secret_version.secret-version.secret_data}' | sudo tee /var/envs/.env && docker run --env-file=/var/envs/.env -p 3000:3000 ${data.google_container_registry_image.api-image.image_url}"
 
   boot_disk {
     initialize_params {
@@ -24,6 +33,7 @@ resource "google_compute_instance" "api" {
     subnetwork = "${var.subnet}"
 
     access_config {
+      nat_ip = "${data.google_compute_address.static-ip-address.address}"
     }
   }
 
