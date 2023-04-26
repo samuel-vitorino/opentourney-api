@@ -29,9 +29,6 @@ const args = parse<IArgs>({
 });
 
 // Set the env file
-const result2 = dotenv.config({
+dotenv.config({
   path: path.join(__dirname, `../env/${args.env}.env`),
 });
-if (result2.error) {
-  throw result2.error;
-}
