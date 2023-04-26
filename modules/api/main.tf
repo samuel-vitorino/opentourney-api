@@ -11,7 +11,7 @@ data "google_container_registry_image" "api-image" {
 }
 
 data "google_compute_address" "static-ip-address" {
-  name = "api-opentourney-${local.network}"
+  name = "opentourney-${local.network}"
   region = "us-central1"
 }
 
