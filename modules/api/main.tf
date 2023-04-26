@@ -12,7 +12,7 @@ resource "google_compute_instance" "api" {
   name         = "${local.network}-server-instance"
   machine_type = "f1-micro"
 
-  metadata_startup_script = "echo 'Ola' > /home/samvitorino/.env; docker run --env-file=/home/samvitorino/.env -p 3000:3000 gcr.io/${var.project}/opentourney-api:latest"
+  metadata_startup_script = "echo '<html><body><h1>Environment: ${local.network}</h1></body></html>' | sudo tee /index.html"
 
   boot_disk {
     initialize_params {
