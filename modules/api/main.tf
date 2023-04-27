@@ -12,7 +12,7 @@ data "google_container_registry_image" "api-image" {
 
 resource "null_resource" "null_im" {
   triggers = {
-    im = data.google_container_registry_image.api-image.digest
+    im = data.google_container_registry_image.api-image.tag
   }
 }
 
