@@ -10,12 +10,6 @@ data "google_container_registry_image" "api-image" {
   name = "opentourney-api"
 }
 
-resource "null_resource" "null_im" {
-  triggers = {
-    im = data.google_container_registry_image.api-image.tag
-  }
-}
-
 data "google_compute_address" "static-ip-address" {
   name = "opentourney-${local.network}"
   region = "us-central1"
@@ -41,12 +35,6 @@ resource "google_compute_instance" "api" {
     access_config {
       nat_ip = "${data.google_compute_address.static-ip-address.address}"
     }
-  }
-
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.null_im
-    ]
   }
 
   tags = ["api${local.network}-server"]
