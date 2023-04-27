@@ -1,7 +1,7 @@
 steps:
 - id: 'Build docker image'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/opentourney-api:latest', '-t',  'gcr.io/$PROJECT_ID/opentourney-api:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/opentourney-api:$COMMIT_SHA', '-t', 'gcr.io/$PROJECT_ID/opentourney-api:latest', '.']
 
 - id: 'Push docker image'
   name: 'gcr.io/cloud-builders/docker'
