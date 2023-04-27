@@ -29,10 +29,6 @@ const args = parse<IArgs>({
 });
 
 // Set the env file
-const conf_file = dotenv.config({
+dotenv.config({
   path: path.join(__dirname, `../env/${args.env}.env`),
 });
-
-if (conf_file.error){
-  console.log("****WARNING: NO ENV FILE PROVIDED, THE API WILL NOT WORK AS EXPECTED****")
-}
