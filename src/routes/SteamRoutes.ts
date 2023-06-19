@@ -3,6 +3,8 @@ import { ISessionUser } from '@src/models/User';
 import SessionUtil from '@src/util/SessionUtil';
 import SteamService from '@src/services/SteamService';
 
+import EnvVars from '@src/constants/EnvVars';
+
 interface SteamUserDetails {
     _json: SteamUser;
 }
@@ -20,10 +22,10 @@ async function steamCallback(req: IReq, res: IRes) {
             throw new Error()
         }
         
-        return res.redirect("http://localhost:5173/settings");
+        return res.redirect(`http://${EnvVars.CookieProps.Options.domain}/settings`);
 
     } catch (error) {
-        return res.redirect("http://localhost:5173/")
+        return res.redirect(`http://${EnvVars.CookieProps.Options.domain}/`)
     }
 }
 
