@@ -1,7 +1,8 @@
 // **** Variables **** //
 
-const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
-  'object with the appropriate user keys.';
+const INVALID_CONSTRUCTOR_PARAM =
+  "nameOrObj arg must a string or an " +
+  "object with the appropriate user keys.";
 
 // **** Types **** //
 
@@ -21,13 +22,13 @@ function new_(
   name: string,
   owner: number,
   avatar?: string,
-  id?: number, // id last cause usually set by db
+  id?: number // id last cause usually set by db
 ): ITeam {
   return {
-    id: (id ?? -1),
+    id: id ?? -1,
     name: name,
     owner: owner,
-    avatar: (avatar ?? ''),
+    avatar: avatar ?? "",
   };
 }
 
@@ -48,13 +49,7 @@ function from(param: object): ITeam {
  * See if the param meets criteria to be a team.
  */
 function isTeam(arg: unknown): boolean {
-  return (
-    !!arg &&
-    typeof arg === 'object' &&
-    'id' in arg &&
-    'owner' in arg &&
-    'name' in arg
-  );
+  return !!arg && typeof arg === "object" && "owner" in arg && "name" in arg;
 }
 
 // **** Export default **** //
