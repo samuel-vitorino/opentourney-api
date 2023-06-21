@@ -13,6 +13,14 @@ export interface ITeam {
   avatar?: string;
 }
 
+export interface ITeamOwner {
+  id: number;
+  name: string;
+  owner: number;
+  avatar?: string;
+  ownerName: string;
+}
+
 // **** Functions **** //
 
 /**

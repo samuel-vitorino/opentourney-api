@@ -1,19 +1,27 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
+import HttpStatusCodes from "@src/constants/HttpStatusCodes";
 
-import UserService from '@src/services/UserService';
-import { IUser } from '@src/models/User';
-import { IReq, IRes } from './types/express/misc';
-import SessionUtil from '@src/util/SessionUtil';
-import { ISessionUser } from '@src/models/User';
-
+import UserService from "@src/services/UserService";
+import { IUser } from "@src/models/User";
+import { IReq, IRes } from "./types/express/misc";
+import SessionUtil from "@src/util/SessionUtil";
+import { ISessionUser } from "@src/models/User";
 
 // **** Functions **** //
 
 /**
  * Get all users.
  */
-async function getAll(_: IReq, res: IRes) {
-  const users = await UserService.getAll();
+async function getAll(req: IReq, res: IRes) {
+  let users = null;
+  console.log("ESTEVE AQUI");
+
+  if (!req.query.name) {
+    users = await UserService.getAll();
+  } else {
+    const user = req.query.name as string;
+    users = await UserService.getAllByName(user);
+  }
+
   return res.status(HttpStatusCodes.OK).json({ users });
 }
 
@@ -21,14 +29,16 @@ async function getOne(req: IReq, res: IRes) {
   try {
     const user = await UserService.getOne(+req.params.id);
     return res.status(HttpStatusCodes.OK).json({ user });
-  } catch(error) {
+  } catch (error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
   }
 }
 
 async function getLoggedIn(req: IReq, res: IRes) {
   try {
-    const userData = <ISessionUser>(await SessionUtil.getSessionData<ISessionUser>(req));
+    const userData = <ISessionUser>(
+      await SessionUtil.getSessionData<ISessionUser>(req)
+    );
     const user = await UserService.getOne(userData.id);
 
     if (user === null) {
@@ -36,15 +46,15 @@ async function getLoggedIn(req: IReq, res: IRes) {
     }
 
     return res.json(user);
-  } catch(error) {
+  } catch (error) {
     return res.status(HttpStatusCodes.UNAUTHORIZED).end();
   }
 }
 
-  /**
+/**
  * Add one user.
  */
-async function add(req: IReq<{user: IUser}>, res: IRes) {
+async function add(req: IReq<{ user: IUser }>, res: IRes) {
   const { user } = req.body;
   await UserService.addOne(user);
   return res.status(HttpStatusCodes.CREATED).end();
@@ -53,7 +63,7 @@ async function add(req: IReq<{user: IUser}>, res: IRes) {
 /**
  * Update one user.
  */
-async function update(req: IReq<{user: IUser}>, res: IRes) {
+async function update(req: IReq<{ user: IUser }>, res: IRes) {
   const { user } = req.body;
   await UserService.updateOne(user);
   return res.status(HttpStatusCodes.OK).end();
@@ -67,7 +77,6 @@ async function delete_(req: IReq, res: IRes) {
   await UserService.delete(id);
   return res.status(HttpStatusCodes.OK).end();
 }
-
 
 // **** Export default **** //
 
