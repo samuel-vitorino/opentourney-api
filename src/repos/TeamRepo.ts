@@ -74,9 +74,28 @@ async function persists(id: number): Promise<boolean> {
  * Add one team.
  */
 async function add(team: ITeam): Promise<void> {
-  const sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
-  const values = [team.name, team.owner, team.avatar];
-  await DB.query(sql, values);
+  //create procedure for doing two requets in one
+
+  const transactionClient = await DB.beginTransaction();
+
+  let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
+  let values = [team.name, team.owner, team.avatar];
+  await DB.queryInTransaction(transactionClient, sql, values);
+
+  sql = "SELECT * FROM teams WHERE name = $1";
+  values = [team.name];
+  let responseTeam = <ITeam>(await DB.queryInTransaction(transactionClient, sql, values))[0];
+
+  team.members?.forEach(async (member) => {
+    sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
+
+    log(member)
+
+    values = [member.id, responseTeam.id];
+    await DB.queryInTransaction(transactionClient, sql, values);
+  });
+
+  await DB.endTransaction(transactionClient);
 }
 
 /**

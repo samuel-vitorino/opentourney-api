@@ -1,5 +1,7 @@
 // **** Variables **** //
 
+import { IUser } from "./User";
+
 const INVALID_CONSTRUCTOR_PARAM =
   "nameOrObj arg must a string or an " +
   "object with the appropriate user keys.";
@@ -11,6 +13,7 @@ export interface ITeam {
   name: string;
   owner: number;
   avatar?: string;
+  members?: IUser[];
 }
 
 export interface ITeamOwner {
@@ -19,6 +22,7 @@ export interface ITeamOwner {
   owner: number;
   avatar?: string;
   ownerName: string;
+  members?: number[];
 }
 
 // **** Functions **** //
@@ -30,6 +34,7 @@ function new_(
   name: string,
   owner: number,
   avatar?: string,
+  members?: IUser[],
   id?: number // id last cause usually set by db
 ): ITeam {
   return {
@@ -37,6 +42,7 @@ function new_(
     name: name,
     owner: owner,
     avatar: avatar ?? "",
+    members: members ?? [],
   };
 }
 
@@ -50,7 +56,7 @@ function from(param: object): ITeam {
   }
   // Get team instance
   const p = param as ITeam;
-  return new_(p.name, p.owner, p.avatar, p.id);
+  return new_(p.name, p.owner, p.avatar, p.members, p.id);
 }
 
 /**

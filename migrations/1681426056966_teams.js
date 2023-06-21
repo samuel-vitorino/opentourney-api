@@ -1,7 +1,7 @@
 exports.up = pgm => {
     pgm.createTable('teams', {
         id: 'id',
-        name: { type: 'varchar(1000)', notNull: true },
+        name: { type: 'varchar(1000)', notNull: true, unique: true },
         avatar: { type: 'varchar(1000)' },
         owner: {
             type: 'integer',
