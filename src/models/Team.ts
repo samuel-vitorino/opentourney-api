@@ -11,18 +11,9 @@ const INVALID_CONSTRUCTOR_PARAM =
 export interface ITeam {
   id: number;
   name: string;
-  owner: number;
+  owner: IUser;
   avatar?: string;
   members?: IUser[];
-}
-
-export interface ITeamOwner {
-  id: number;
-  name: string;
-  owner: number;
-  avatar?: string;
-  ownerName: string;
-  members?: number[];
 }
 
 // **** Functions **** //
@@ -32,7 +23,7 @@ export interface ITeamOwner {
  */
 function new_(
   name: string,
-  owner: number,
+  owner: IUser,
   avatar?: string,
   members?: IUser[],
   id?: number // id last cause usually set by db

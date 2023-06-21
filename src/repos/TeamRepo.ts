@@ -1,4 +1,4 @@
-import { ITeam, ITeamOwner } from "@src/models/Team";
+import { ITeam } from "@src/models/Team";
 import DB from "./DB";
 import { log } from "console";
 
@@ -22,11 +22,11 @@ async function getOneById(id: number): Promise<ITeam | null> {
 /**
  * Get all teams.
  */
-async function getAll(): Promise<ITeamOwner[]> {
+async function getAll(): Promise<ITeam[]> {
   const sql =
     "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id";
   const rows = await DB.query(sql);
-  return <ITeamOwner[]>rows;
+  return <ITeam[]>rows;
 }
 
 // // Get one team by their user id.
@@ -53,12 +53,12 @@ async function getAll(): Promise<ITeamOwner[]> {
 /**
  * Get all teams by user id, being the owner the name of the user.
  */
-async function getAllByUserId(id: number): Promise<ITeamOwner[]> {
+async function getAllByUserId(id: number): Promise<ITeam[]> {
   const sql =
     "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id WHERE users.id = $1";
   const rows = await DB.query(sql, [id]);
 
-  return <ITeamOwner[]>rows;
+  return <ITeam[]>rows;
 }
 
 /**
@@ -78,8 +78,10 @@ async function add(team: ITeam): Promise<void> {
 
   const transactionClient = await DB.beginTransaction();
 
+  console.log(team)
+
   let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
-  let values = [team.name, team.owner, team.avatar];
+  let values: any = [team.name, team.owner.id, team.avatar];
   await DB.queryInTransaction(transactionClient, sql, values);
 
   sql = "SELECT * FROM teams WHERE name = $1";
@@ -88,9 +90,6 @@ async function add(team: ITeam): Promise<void> {
 
   team.members?.forEach(async (member) => {
     sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
-
-    log(member)
-
     values = [member.id, responseTeam.id];
     await DB.queryInTransaction(transactionClient, sql, values);
   });

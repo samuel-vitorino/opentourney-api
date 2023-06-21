@@ -1,5 +1,5 @@
 import TeamRepo from "@src/repos/TeamRepo";
-import { ITeam, ITeamOwner } from "@src/models/Team";
+import { ITeam } from "@src/models/Team";
 import { RouteError } from "@src/other/classes";
 import HttpStatusCodes from "@src/constants/HttpStatusCodes";
 
@@ -12,7 +12,7 @@ export const TEAM_NOT_FOUND_ERR = "Team not found";
 /**
  * Get all teams.
  */
-function getAll(): Promise<ITeamOwner[]> {
+function getAll(): Promise<ITeam[]> {
   return TeamRepo.getAll();
 }
 
@@ -28,7 +28,7 @@ function getOne(id: number): Promise<ITeam | null> {
 /**
  * Get All Teams By User
  */
-function getAllByUser(id: number): Promise<ITeamOwner[]> {
+function getAllByUser(id: number): Promise<ITeam[]> {
   return TeamRepo.getAllByUserId(id);
 }
 
