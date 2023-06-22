@@ -19,6 +19,7 @@ import { log } from "console";
 async function getOne(req: IReq, res: IRes) {
   try {
     const team = await TeamService.getOne(+req.params.id);
+    log(team);
     return res.status(HttpStatusCodes.OK).json({ team });
   } catch (error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
@@ -46,7 +47,6 @@ async function getAll(req: IReq, res: IRes) {
       const owner = parseInt(req.query.owner as string);
 
       teams = await TeamService.getAllByUser(owner);
-
     }
 
     // log(teams);

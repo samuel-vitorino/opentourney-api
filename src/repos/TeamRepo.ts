@@ -1,6 +1,7 @@
 import { ITeam } from "@src/models/Team";
 import DB from "./DB";
 import Request from "@src/models/Request";
+import { log } from "console";
 
 // **** Functions **** //
 
@@ -56,7 +57,7 @@ async function getOneById(id: number): Promise<ITeam | null> {
     }
   }
 
-  return <ITeam>rows[0];
+  return teams[0];
 }
 
 /**
@@ -205,7 +206,8 @@ async function add(team: ITeam): Promise<void> {
 
   const transactionClient = await DB.beginTransaction();
 
-  let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3) RETURNING id";
+  let sql =
+    "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3) RETURNING id";
   let values: any = [team.name, team.owner.id, team.avatar];
   let id = (await DB.queryInTransaction(transactionClient, sql, values))[0].id;
 
@@ -236,12 +238,10 @@ async function add(team: ITeam): Promise<void> {
  * Update a team.
  */
 async function update(team: ITeam): Promise<void> {
-
   const sql_team =
     "UPDATE teams SET name = $1, owner = $2, avatar = $3 WHERE id = $4";
   const values_team = [team.name, team.owner.id, team.avatar, team.id];
   await DB.query(sql_team, values_team);
-
 
   // member id list
   let memberIds = team.members?.map((member) => member.id);
@@ -273,12 +273,15 @@ async function update(team: ITeam): Promise<void> {
 
     const sql_another = "SELECT user_id FROM requests WHERE team_id = $1";
     const values = [team.id];
-    const rows = await DB.queryInTransaction(clientTransaction, sql_another, values);
+    const rows = await DB.queryInTransaction(
+      clientTransaction,
+      sql_another,
+      values
+    );
 
     const newTeamMembers: number[] = memberIds!.filter((element) => {
       return !rows.some((item: any) => item.user_id === element);
     });
-
 
     // clientTransaction = await DB.beginTransaction();
 
@@ -301,9 +304,14 @@ async function update(team: ITeam): Promise<void> {
  * Delete one team.
  */
 async function delete_(id: number): Promise<void> {
-  const sql = "DELETE FROM teams WHERE id = $1";
-  const values = [id];
-  await DB.query(sql, values);
+  log(`Deleting team ${id}`);
+  const sql_requests = "DELETE FROM requests WHERE team_id = $1";
+  const values_requests = [id];
+  await DB.query(sql_requests, values_requests);
+
+  const sql_teams = "DELETE FROM teams WHERE id = $1";
+  const values_teams = [id];
+  await DB.query(sql_teams, values_teams);
 }
 
 // **** Export default **** //
