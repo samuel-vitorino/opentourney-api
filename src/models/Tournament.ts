@@ -5,6 +5,14 @@ const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' +
 
 // **** Types **** //
 
+enum StageType {
+  roundRobin,
+  singleElimination,
+  doubleElimination,
+  roundRobinSingleElimination,
+  roundRobinDoubleElimination
+}
+
 export interface ITournament {
   id: number;
   name: string;
@@ -14,6 +22,8 @@ export interface ITournament {
   information: string;
   prizes: string[];
   status: number;
+  stages: StageType;
+  currentStage: number;
   avatar?: string;
 }
 
@@ -30,6 +40,8 @@ function new_(
   information: string,
   prizes: Array<string>,
   status: number,
+  stages: StageType,
+  currentStage: number,
   avatar?: string,
   id?: number, // id last cause usually set by db
 ): ITournament {
@@ -42,6 +54,8 @@ function new_(
     information: information,
     prizes: prizes,
     status: status,
+    stages: stages,
+    currentStage: currentStage,
     avatar: (avatar ?? ''),
   };
 }
@@ -56,7 +70,7 @@ function from(param: object): ITournament {
   }
   // Get tournament instance
   const p = param as ITournament;
-  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.avatar, p.id);
+  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.stages, p.currentStage, p.avatar, p.id);
 }
 
 /**
@@ -70,7 +84,9 @@ function isTournament(arg: unknown): boolean {
     'name' in arg &&
     'admin' in arg &&
     'organizer' in arg &&
-    'information' in arg
+    'information' in arg &&
+    'stages' in arg &&
+    'currentStage' in arg
   );
 }
 

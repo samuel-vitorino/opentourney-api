@@ -197,36 +197,15 @@ apiRouter.use(teamRouter);
 
 const matchRouter = Router();
 
-// Get all matches
-matchRouter.get(
-  Paths.Matches.Base,
-  MatchRoutes.getAll,
-);
+// Get all games
+//matchRouter.get(
+//  Paths.Matches.Base,
+//  GameRoutes.getAll,
+//);
 
 matchRouter.get(
   Paths.Matches.GetOne,
   MatchRoutes.getOne,
-);
-
-// Add one match
-matchRouter.post(
-  Paths.Matches.Base,
-  validate(['match', Match.isMatch]),
-  MatchRoutes.add,
-);
-
-// Update one match
-matchRouter.put(
-  Paths.Matches.GetOne,
-  [validate(['match', Match.isMatch])],
-  MatchRoutes.update,
-);
-
-// Delete one match
-matchRouter.delete(
-  Paths.Matches.GetOne,
-  [validate(['id', 'number', 'params'])],
-  MatchRoutes.delete,
 );
 
 // Add MatchRouter

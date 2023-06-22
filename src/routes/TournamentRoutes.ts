@@ -32,13 +32,13 @@ async function add(req: IReq<{tournament: ITournament}>, res: IRes) {
   const { tournament } = req.body;
   
   if (tournament.avatar) {
-    const matches = tournament.avatar.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
+    const games = tournament.avatar.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    if (!games || games.length !== 3) {
       return res.status(400).send('Invalid base64 image data.');
     }
 
-    const imageExtension = matches[1].split('/')[1];
-    const base64Image = matches[2];
+    const imageExtension = games[1].split('/')[1];
+    const base64Image = games[2];
 
     // Generate a unique filename for the image
     const filename = `${Date.now()}_${tournament.name}.${imageExtension}`;
@@ -67,13 +67,13 @@ async function update(req: IReq<{tournament: ITournament}>, res: IRes) {
   const { tournament } = req.body;
 
   if (tournament.avatar !== undefined) {
-    const matches = tournament.avatar!.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
+    const games = tournament.avatar!.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    if (!games || games.length !== 3) {
       return res.status(400).send('Invalid base64 image data.');
     }
 
-    const imageExtension = matches[1].split('/')[1];
-    const base64Image = matches[2];
+    const imageExtension = games[1].split('/')[1];
+    const base64Image = games[2];
 
     // Generate a unique filename for the image
     const filename = `${Date.now()}_${tournament.name}.${imageExtension}`;

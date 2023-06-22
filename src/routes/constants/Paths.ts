@@ -30,8 +30,7 @@ const Paths = {
     GetOne: '/teams/:id'
   },
   Matches: {
-    Base: '/matches',
-    GetOne: '/matches/:id'
+    GetOne: '/games/:id'
   },
 };
 

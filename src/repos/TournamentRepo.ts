@@ -86,9 +86,9 @@ async function persists(id: number): Promise<boolean> {
  * Add one tournament.
  */
 async function add(tournament: ITournament): Promise<void> {
-  const sql = 'INSERT INTO tournaments (name, admin, max_teams, organizer, information, status, avatar) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id';
+  const sql = 'INSERT INTO tournaments (name, admin, max_teams, organizer, information, status, stages, current_stage, avatar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id';
   const sql_prizes = 'INSERT INTO prizes (prize, rank, tournament) VALUES ($1, $2, $3)';
-  const values = [tournament.name, tournament.admin, tournament.max_teams, tournament.organizer, tournament.information, tournament.status, tournament.avatar];
+  const values = [tournament.name, tournament.admin, tournament.max_teams, tournament.organizer, tournament.information, tournament.status, tournament.stages, tournament.currentStage, tournament.avatar];
   const insertedTournamentList: ITournament[] = await DB.query(sql, values);
 
   for (let i = 0; i < tournament.prizes.length; i++) {

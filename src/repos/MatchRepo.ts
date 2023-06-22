@@ -1,3 +1,4 @@
+import { IGame } from '@src/models/Game';
 import { IMatch } from '@src/models/Match';
 import DB from './DB';
 
@@ -8,14 +9,23 @@ import DB from './DB';
  */
 
 async function getOneById(id: number): Promise<IMatch | null> {
-  const sql = 'SELECT * FROM matches WHERE id = $1';
-  const rows = await DB.query(sql, [id]);
+  let sql = 'SELECT * FROM matches WHERE id = $1';
+  let rows = await DB.query(sql, [id]);
 
   if (rows.length === 0) {
     return null;
   }
 
-  return <IMatch>rows[0];
+  const match = <IMatch>rows[0];
+
+  sql = 'SELECT * FROM games WHERE match = $1';
+  rows = await DB.query(sql, [match.id]);
+
+  if (rows.length > 0) {
+    match.games = <IGame[]>rows;
+  }
+
+  return match;
 }
 
 /**
@@ -40,8 +50,8 @@ async function persists(id: number): Promise<boolean> {
  * Add one match.
  */
 async function add(match: IMatch): Promise<void> {
-  const sql = 'INSERT INTO matches (status, team_1, team_2, connect_ip, map) VALUES ($1, $2, $3. $4, $5)';
-  const values = [match.status, match.team_1, match.team_2, match.connect_ip, match.map];
+  const sql = 'INSERT INTO matches (type, tournament, team_one, team_two) VALUES ($1, $2, $3. $4)';
+  const values = [match.type, match.tournament, match.team_one, match.team_two];
   await DB.query(sql, values);
 }
 
@@ -49,8 +59,8 @@ async function add(match: IMatch): Promise<void> {
  * Update a match.
  */
 async function update(match: IMatch): Promise<void> {
-  const sql = 'UPDATE matches SET status = $1, team_1 = $2, team_2 = $3, connect_ip = $4, map = $5 WHERE id = $6';
-  const values = [match.status, match.team_1, match.team_2, match.connect_ip, match.map, match.id];
+  const sql = 'UPDATE matches SET type = $1, tournament = $2, team_one = $3, team_two = $4, currentGame = $5 WHERE id = $6';
+  const values = [match.type, match.tournament, match.team_one, match.team_two, match.currentGame, match.id];
   await DB.query(sql, values);
 }
 
