@@ -1,66 +1,76 @@
 // **** Variables **** //
 
+import { IGame } from "./Game";
+
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
   'object with the appropriate user keys.';
+
+enum MatchType {
+    BO1,
+    BO3
+}
 
 // **** Types **** //
 
 export interface IMatch {
   id: number;
-  status: number;
-  team_1: number;
-  team_2: number;
-  connect_ip?: string;
-  map?: string;
+  type: MatchType;
+  currentGame: number;
+  tournament: number;
+  team_one: number;
+  team_two: number;
+  games: IGame[];
 }
 
 // **** Functions **** //
 
 /**
- * Create new Match.
+ * Create new Game.
  */
 function new_(
-  status: number,
-  team_1: number,
-  team_2: number,
-  connect_ip?: string,
-  map?: string,
+  type: MatchType,
+  currentGame: number,
+  tournament: number,
+  team_one: number,
+  team_two: number,
+  games: IGame[],
   id?: number, // id last cause usually set by db
 ): IMatch {
   return {
     id: (id ?? -1),
-    status: status,
-    team_1: team_1,
-    team_2: team_2,
-    connect_ip: (connect_ip ?? ''),
-    map: (map ?? ''),
+    type: type,
+    currentGame: currentGame,
+    tournament: tournament,
+    team_one: team_one,
+    team_two: team_two,
+    games: games
   };
 }
 
 /**
- * Get match instance from object.
+ * Get game instance from object.
  */
 function from(param: object): IMatch {
-  // Check is match
+  // Check is game
   if (!isMatch(param)) {
     throw new Error(INVALID_CONSTRUCTOR_PARAM);
   }
-  // Get match instance
+  // Get game instance
   const p = param as IMatch;
-  return new_(p.status, p.team_1, p.team_2, p.connect_ip, p.map, p.id);
+  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.games, p.id);
 }
 
 /**
- * See if the param meets criteria to be a match.
+ * See if the param meets criteria to be a game.
  */
 function isMatch(arg: unknown): boolean {
   return (
     !!arg &&
     typeof arg === 'object' &&
-    'id' in arg &&
-    'status' in arg &&
-    'team_1' in arg &&
-    'team_2' in arg
+    'type' in arg &&
+    'tournament' in arg &&
+    'team_one' in arg &&
+    'team_two' in arg
   );
 }
 

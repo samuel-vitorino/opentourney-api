@@ -25,23 +25,23 @@ function getOne(id: number): Promise<IMatch | null> {
 /**
  * Add one match.
  */
-function addOne(match: IMatch): Promise<void> {
-  return MatchRepo.add(match);
+function addOne(game: IMatch): Promise<void> {
+  return MatchRepo.add(game);
 }
 
 /**
  * Update one match.
  */
-async function updateOne(match: IMatch): Promise<void> {
-  const persists = await MatchRepo.persists(match.id);
+async function updateOne(game: IMatch): Promise<void> {
+  const persists = await MatchRepo.persists(game.id);
   if (!persists) {
     throw new RouteError(
       HttpStatusCodes.NOT_FOUND,
       MATCH_NOT_FOUND_ERR,
     );
   }
-  // Return match
-  return MatchRepo.update(match);
+  // Return game
+  return MatchRepo.update(game);
 }
 
 /**
@@ -55,7 +55,7 @@ async function _delete(id: number): Promise<void> {
       MATCH_NOT_FOUND_ERR,
     );
   }
-  // Delete match
+  // Delete game
   return MatchRepo.delete(id);
 }
 

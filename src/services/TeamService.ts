@@ -36,20 +36,20 @@ function getAllByUser(id: number): Promise<ITeam[]> {
 /**
  * Add one team.
  */
-function addOne(team: ITeam): Promise<void> {
-  return TeamRepo.add(team);
+function addOne(team: ITeam, isAdmin: boolean = false): Promise<void> {
+  return TeamRepo.add(team, isAdmin);
 }
 
 /**
  * Update one team.
  */
-async function updateOne(team: ITeam): Promise<void> {
+async function updateOne(team: ITeam, isAdmin: boolean = false): Promise<void> {
   const persists = await TeamRepo.persists(team.id);
   if (!persists) {
     throw new RouteError(HttpStatusCodes.NOT_FOUND, TEAM_NOT_FOUND_ERR);
   }
   // Return team
-  return TeamRepo.update(team);
+  return TeamRepo.update(team, isAdmin);
 }
 
 /**

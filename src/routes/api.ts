@@ -2,6 +2,7 @@ import { Router } from "express";
 import jetValidator from "jet-validator";
 import passport from "passport";
 
+import userTournamentMw from './middleware/userTournamentMw';
 import developerMw from "./middleware/developerMw";
 import userDevMw from "./middleware/userDevMw";
 import userMw from "./middleware/userMw";
@@ -15,7 +16,6 @@ import TeamRoutes from "./TeamRoutes";
 import MatchRoutes from "./MatchRoutes";
 import Tournament from "@src/models/Tournament";
 import Team from "@src/models/Team";
-import Match from "@src/models/Match";
 import RequestRoutes from "./RequestRoutes";
 import Request from "@src/models/Request";
 
@@ -63,7 +63,15 @@ userRouter.get(Paths.Users.Base, UserRoutes.getAll);
 
 userRouter.get(Paths.Users.LoggedIn, UserRoutes.getLoggedIn);
 
-userRouter.get(Paths.Users.GetOne, UserRoutes.getOne);
+userRouter.get(
+  Paths.Users.GetTournaments,
+  UserRoutes.getAllTournaments
+);
+
+userRouter.get(
+  Paths.Users.GetOne,
+  UserRoutes.getOne,
+);
 
 // Add one user
 userRouter.post(
@@ -100,7 +108,11 @@ tournamentRouter.get(
   TournamentRoutes.getAll
 );
 
-tournamentRouter.get(Paths.Tournaments.GetOne, TournamentRoutes.getOne);
+tournamentRouter.get(
+  Paths.Tournaments.GetOne,
+  [userTournamentMw],
+  TournamentRoutes.getOne,
+);
 
 // Add one tournament
 tournamentRouter.post(
@@ -112,15 +124,24 @@ tournamentRouter.post(
 // Update one tournament
 tournamentRouter.put(
   Paths.Tournaments.GetOne,
-  [validate(["tournament", Tournament.isTournament]), userDevMw],
-  TournamentRoutes.update
+  [validate(['tournament', Tournament.isTournament]), userTournamentMw],
+  TournamentRoutes.update,
+);
+
+
+
+// Update one tournament
+tournamentRouter.patch(
+  Paths.Tournaments.GetOne,
+  [userTournamentMw],
+  TournamentRoutes.updateStatus,
 );
 
 // Delete one tournament
 tournamentRouter.delete(
   Paths.Tournaments.GetOne,
-  [validate(["id", "number", "params"]), userDevMw],
-  TournamentRoutes.delete
+  [validate(['id', 'number', 'params']), userTournamentMw],
+  TournamentRoutes.delete,
 );
 
 // Add TournamentRouter
@@ -188,31 +209,13 @@ apiRouter.use(requestRouter);
 
 const matchRouter = Router();
 
-// Get all matches
-matchRouter.get(Paths.Matches.Base, MatchRoutes.getAll);
+// Get all games
+//matchRouter.get(
+//  Paths.Matches.Base,
+//  GameRoutes.getAll,
+//);
 
 matchRouter.get(Paths.Matches.GetOne, MatchRoutes.getOne);
-
-// Add one match
-matchRouter.post(
-  Paths.Matches.Base,
-  validate(["match", Match.isMatch]),
-  MatchRoutes.add
-);
-
-// Update one match
-matchRouter.put(
-  Paths.Matches.GetOne,
-  [validate(["match", Match.isMatch])],
-  MatchRoutes.update
-);
-
-// Delete one match
-matchRouter.delete(
-  Paths.Matches.GetOne,
-  [validate(["id", "number", "params"])],
-  MatchRoutes.delete
-);
 
 // Add MatchRouter
 apiRouter.use(matchRouter);

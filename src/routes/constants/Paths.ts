@@ -15,9 +15,10 @@ const Paths = {
     SteamCallback: "/steam/return",
   },
   Users: {
-    Base: "/users",
-    GetOne: "/users/:id",
-    LoggedIn: "/users/me",
+    Base: '/users',
+    GetOne: '/users/:id',
+    LoggedIn: '/users/me',
+    GetTournaments: '/users/:id/tournaments'
   },
   Tournaments: {
     Base: "/tournaments",
@@ -33,8 +34,7 @@ const Paths = {
     GetOne: "/requests/:id",
   },
   Matches: {
-    Base: "/matches",
-    GetOne: "/matches/:id",
+    GetOne: '/games/:id'
   },
 };
 

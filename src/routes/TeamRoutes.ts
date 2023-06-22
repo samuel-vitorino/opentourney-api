@@ -4,6 +4,19 @@ import TeamService from "@src/services/TeamService";
 import { ITeam } from "@src/models/Team";
 import { IReq, IRes } from "./types/express/misc";
 import { log } from "console";
+import SessionUtil from "@src/util/SessionUtil";
+import { ISessionUser, UserRoles } from "@src/models/User";
+import { JwtPayload } from "jsonwebtoken";
+
+
+
+type TSessionData = ISessionUser & JwtPayload;
+
+async function isAdmin(req: any): Promise<boolean> {
+  const sessionData = await SessionUtil.getSessionData<TSessionData>(req);
+  return typeof sessionData === 'object' &&
+    (sessionData?.id === +req.params.id || sessionData?.role === UserRoles.Developer)
+}
 
 // **** Functions **** //
 
@@ -48,9 +61,6 @@ async function getAll(req: IReq, res: IRes) {
 
       teams = await TeamService.getAllByUser(owner);
     }
-
-    // log(teams);
-
     return res.status(HttpStatusCodes.OK).json({ teams });
   } catch (error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
@@ -62,7 +72,7 @@ async function getAll(req: IReq, res: IRes) {
  */
 async function add(req: IReq<{ team: ITeam }>, res: IRes) {
   const { team } = req.body;
-  await TeamService.addOne(team);
+  await TeamService.addOne(team, await isAdmin(req));
   return res.status(HttpStatusCodes.CREATED).end();
 }
 
@@ -71,7 +81,7 @@ async function add(req: IReq<{ team: ITeam }>, res: IRes) {
  */
 async function update(req: IReq<{ team: ITeam }>, res: IRes) {
   const { team } = req.body;
-  await TeamService.updateOne(team);
+  await TeamService.updateOne(team, await isAdmin(req));
   return res.status(HttpStatusCodes.OK).end();
 }
 

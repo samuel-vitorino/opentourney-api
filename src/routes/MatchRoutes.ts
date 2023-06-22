@@ -10,14 +10,14 @@ import { IReq, IRes } from './types/express/misc';
  * Get all matches.
  */
 async function getAll(_: IReq, res: IRes) {
-  const matches = await MatchService.getAll();
-  return res.status(HttpStatusCodes.OK).json({ matches });
+  const games = await MatchService.getAll();
+  return res.status(HttpStatusCodes.OK).json({ games });
 }
 
 async function getOne(req: IReq, res: IRes) {
   try {
-    const match = await MatchService.getOne(+req.params.id);
-    return res.status(HttpStatusCodes.OK).json({ match });
+    const game = await MatchService.getOne(+req.params.id);
+    return res.status(HttpStatusCodes.OK).json({ game });
   } catch(error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
   }
@@ -26,18 +26,18 @@ async function getOne(req: IReq, res: IRes) {
 /**
  * Add one match.
  */
-async function add(req: IReq<{match: IMatch}>, res: IRes) {
-  const { match } = req.body;
-  await MatchService.addOne(match);
+async function add(req: IReq<{game: IMatch}>, res: IRes) {
+  const { game } = req.body;
+  await MatchService.addOne(game);
   return res.status(HttpStatusCodes.CREATED).end();
 }
 
 /**
  * Update one match.
  */
-async function update(req: IReq<{match: IMatch}>, res: IRes) {
-  const { match } = req.body;
-  await MatchService.updateOne(match);
+async function update(req: IReq<{game: IMatch}>, res: IRes) {
+  const { game } = req.body;
+  await MatchService.updateOne(game);
   return res.status(HttpStatusCodes.OK).end();
 }
 
