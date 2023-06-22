@@ -19,6 +19,8 @@ export interface IRequest {
     user_id: number;
     team_id: number;
     status: RequestStatus;
+    username?: string;
+    teamname?: string;
 }
 
 // **** Functions **** //
@@ -30,6 +32,8 @@ function new_(
     user_id: number,
     team_id: number,
     status: RequestStatus,
+    username?: string,
+    teamaname?: string,
     id?: number // id last cause usually set by db
 ): IRequest {
     return {
@@ -37,6 +41,8 @@ function new_(
         user_id: user_id ?? -1,
         team_id: team_id ?? -1,
         status: status ?? -1,
+        username: username ?? "",
+        teamname: teamaname ?? "",
     };
 }
 
@@ -50,7 +56,7 @@ function from(param: object): IRequest {
     }
     // Get team instance
     const p = param as IRequest;
-    return new_(p.user_id, p.team_id, p.status, p.id);
+    return new_(p.user_id, p.team_id, p.status, p.teamname, p.username, p.id);
 }
 
 /**

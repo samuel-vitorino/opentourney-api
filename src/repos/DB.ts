@@ -1,3 +1,4 @@
+import { log } from 'console';
 import { Pool, PoolClient } from 'pg';
 
 // **** Variables **** //
@@ -20,7 +21,10 @@ async function query(sql: string, values?: any[]): Promise<any> {
   try {
     const result = await client.query(sql, values);
     return result.rows;
-  } finally {
+  } catch (e) {
+    log(e);
+  }
+  finally {
     client.release();
   }
 }
