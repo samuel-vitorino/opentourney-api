@@ -19,7 +19,7 @@ exports.up = pgm => {
             default: 0,
             onDelete: 'cascade',
         },
-        createdAt: {
+        createdat: {
             type: 'timestamp',
             notNull: true,
             default: pgm.func('current_timestamp'),
