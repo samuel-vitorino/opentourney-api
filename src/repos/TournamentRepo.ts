@@ -174,6 +174,8 @@ async function delete_(id: number): Promise<void> {
   const sql = 'DELETE FROM tournaments WHERE id = $1';
   const values = [id];
   await DB.query(sql, values);
+
+  await app.locals.manager.delete.tournament(id);
 }
 
 // **** Export default **** //
