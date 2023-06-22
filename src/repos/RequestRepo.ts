@@ -51,11 +51,11 @@ async function add(request: IRequest): Promise<void> {
 
 async function getAllByUserId(id: number): Promise<IRequest[]> {
     const sql =
-      "SELECT * FROM requests WHERE user_id = $1";
+        "SELECT * FROM requests WHERE user_id = $1";
     const rows = await DB.query(sql, [id]);
-  
+
     return <IRequest[]>rows;
-  }
+}
 
 /**
  * Update a request.

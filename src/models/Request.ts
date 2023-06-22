@@ -1,5 +1,7 @@
 // **** Variables **** //
 
+import { log } from "console";
+
 const INVALID_CONSTRUCTOR_PARAM =
     "nameOrObj arg must a string or an " +
     "object with the appropriate user keys.";
@@ -55,7 +57,11 @@ function from(param: object): IRequest {
  * See if the param meets criteria to be a Request.
  */
 function isRequest(arg: unknown): boolean {
-    return !!arg && typeof arg === "object" && "owner" in arg && "name" in arg;
+    return !!arg && typeof arg === "object" && "user_id" in arg && "team_id" in arg && "status" in arg;
+}
+
+function isRequestUpdate(arg: unknown): boolean {
+    return !!arg && typeof arg === "object" && "status" in arg;
 }
 
 // **** Export default **** //
@@ -64,5 +70,6 @@ export default {
     new: new_,
     from,
     isRequest,
+    isRequestUpdate,
     RequestStatus,
 } as const;

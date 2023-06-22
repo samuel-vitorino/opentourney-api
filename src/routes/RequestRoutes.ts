@@ -3,6 +3,7 @@ import HttpStatusCodes from "@src/constants/HttpStatusCodes";
 import RequestService from "@src/services/RequestService";
 import { IRequest } from "@src/models/Request";
 import { IReq, IRes } from "./types/express/misc";
+import { log } from "console";
 
 // **** Functions **** //
 
