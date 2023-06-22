@@ -9,11 +9,50 @@ import { log } from "console";
  */
 
 async function getOneById(id: number): Promise<ITeam | null> {
-  const sql = "SELECT * FROM teams WHERE id = $1";
+  const sql = `
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      FROM teams t
+      LEFT JOIN users u1 ON t.owner = u1.id
+      LEFT JOIN teams_users tm ON t.id = tm.team_id
+      LEFT JOIN users u2 ON tm.user_id = u2.id
+      WHERE t.id = $1
+    `;
   const rows = await DB.query(sql, [id]);
-
   if (rows.length === 0) {
     return null;
+  }
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+      });
+    }
   }
 
   return <ITeam>rows[0];
@@ -22,12 +61,51 @@ async function getOneById(id: number): Promise<ITeam | null> {
 /**
  * Get all teams.
  */
-async function getAll(): Promise<ITeam[]> {
-  const sql =
-    "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id";
+export const getAll = async (): Promise<ITeam[]> => {
+  const sql = `
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      FROM teams t
+      LEFT JOIN users u1 ON t.owner = u1.id
+      LEFT JOIN teams_users tm ON t.id = tm.team_id
+      LEFT JOIN users u2 ON tm.user_id = u2.id
+    `;
   const rows = await DB.query(sql);
-  return <ITeam[]>rows;
-}
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+      });
+    }
+  }
+  // log(teams);
+  return teams;
+};
 
 // // Get one team by their user id.
 // async function getOneByUserId(id: number): Promise<ITeam | null> {
@@ -53,13 +131,60 @@ async function getAll(): Promise<ITeam[]> {
 /**
  * Get all teams by user id, being the owner the name of the user.
  */
-async function getAllByUserId(id: number): Promise<ITeam[]> {
-  const sql =
-    "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id WHERE users.id = $1";
-  const rows = await DB.query(sql, [id]);
+// async function getAllByUserId(id: number): Promise<ITeam[]> {
+//   const sql =
+//     "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id WHERE users.id = $1";
+//   const rows = await DB.query(sql, [id]);
 
-  return <ITeam[]>rows;
-}
+//   return <ITeam[]>rows;
+// }
+
+export const getAllByUserId = async (id: number): Promise<ITeam[]> => {
+  const sql = `
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      FROM teams t
+      LEFT JOIN users u1 ON t.owner = u1.id
+      LEFT JOIN teams_users tm ON t.id = tm.team_id
+      LEFT JOIN users u2 ON tm.user_id = u2.id
+      WHERE t.owner = $1
+    `;
+  const rows = await DB.query(sql, [id]);
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+      });
+    }
+  }
+  // log(teams);
+  return teams;
+};
 
 /**
  * See if a team with the given id exists.
@@ -78,7 +203,7 @@ async function add(team: ITeam): Promise<void> {
 
   const transactionClient = await DB.beginTransaction();
 
-  console.log(team)
+  // console.log(team);
 
   let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
   let values: any = [team.name, team.owner.id, team.avatar];
@@ -86,7 +211,9 @@ async function add(team: ITeam): Promise<void> {
 
   sql = "SELECT * FROM teams WHERE name = $1";
   values = [team.name];
-  let responseTeam = <ITeam>(await DB.queryInTransaction(transactionClient, sql, values))[0];
+  let responseTeam = <ITeam>(
+    (await DB.queryInTransaction(transactionClient, sql, values))[0]
+  );
 
   team.members?.forEach(async (member) => {
     sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
@@ -101,10 +228,75 @@ async function add(team: ITeam): Promise<void> {
  * Update a team.
  */
 async function update(team: ITeam): Promise<void> {
-  const sql =
+
+  const sql_team =
     "UPDATE teams SET name = $1, owner = $2, avatar = $3 WHERE id = $4";
-  const values = [team.name, team.owner, team.avatar, team.id];
-  await DB.query(sql, values);
+  const values_team = [team.name, team.owner.id, team.avatar, team.id];
+  await DB.query(sql_team, values_team);
+
+  // team.members?.forEach(async (member) => {
+  //   const sql_team_users =
+  //     "UPDATE teams_users SET user_id = $1 WHERE team_id = $2 AND user_id = $3";
+  //   const values_team_users = [member.id, member.id, team.id];
+  //   await DB.query(sql_team_users, values_team_users);
+  // });
+
+  // member id list
+  let memberIds = team.members?.map((member) => member.id);
+
+  if (memberIds?.length !== 0) {
+    let params: string[] = [];
+    memberIds?.forEach((memberId, index) => {
+      params.push(`$` + (index + 2));
+    });
+    const sql_team_remove_users =
+      "SELECT id FROM teams_users WHERE team_id = $1 AND user_id NOT IN (" +
+      params.join(",") +
+      ")";
+    const values_team_users = [team.id, ...memberIds!!];
+    let ids: any[] = await DB.query(sql_team_remove_users, values_team_users);
+
+    let clientTransaction = await DB.beginTransaction();
+
+    ids.forEach(async (id) => {
+      const sql_team_users = "DELETE FROM teams_users WHERE id = $1";
+      const values_team_users = [id.id];
+      await DB.queryInTransaction(
+        clientTransaction,
+        sql_team_users,
+        values_team_users
+      );
+    });
+    DB.endTransaction(clientTransaction);
+
+    const sql_another = "SELECT user_id FROM teams_users WHERE team_id = $1";
+    const values = [team.id];
+    const rows = await DB.query(sql_another, values);
+
+    const newTeamMembers: number[] = memberIds!.filter((element) => {
+      return !rows.some((item: any) => item.user_id === element);
+    });
+
+
+    params = [];
+    newTeamMembers.forEach((newTeamMember, index) => {
+      params.push(`$` + (index + 2));
+    });
+
+    clientTransaction = await DB.beginTransaction();
+
+    newTeamMembers.forEach(async (id) => {
+      const sql_team_users =
+        "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
+      const values_team_users = [id, team.id];
+      await DB.queryInTransaction(
+        clientTransaction,
+        sql_team_users,
+        values_team_users
+      );
+    });
+    DB.endTransaction(clientTransaction);
+  }
 }
 
 /**

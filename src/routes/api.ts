@@ -145,7 +145,7 @@ teamRouter.post(
 teamRouter.put(
   Paths.Teams.GetOne,
   [validate(["team", Team.isTeam])],
-  TournamentRoutes.update
+  TeamRoutes.update
 );
 
 // Delete one team

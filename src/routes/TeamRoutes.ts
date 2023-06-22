@@ -46,7 +46,10 @@ async function getAll(req: IReq, res: IRes) {
       const owner = parseInt(req.query.owner as string);
 
       teams = await TeamService.getAllByUser(owner);
+
     }
+
+    // log(teams);
 
     return res.status(HttpStatusCodes.OK).json({ teams });
   } catch (error) {
