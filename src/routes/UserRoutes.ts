@@ -16,8 +16,6 @@ import { log } from "console";
 async function getAll(req: IReq, res: IRes) {
   let users = null;
 
-  log(req.query.role);
-
   if (req.query.name) {
     const user = req.query.name as string;
     users = await UserService.getAllByName(user);
