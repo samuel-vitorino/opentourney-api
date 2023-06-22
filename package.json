@@ -10,7 +10,7 @@
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "npx ts-node --files -r tsconfig-paths/register ./spec",
     "migrate:dev": "node_modules/.bin/node-pg-migrate --envPath env/development.env",
-    "migrate:prod": "node_modules/.bin/node-pg-migrate --envPath env/prod.env"
+    "migrate:prod": "node_modules/.bin/node-pg-migrate --envPath env/production.env"
   },
   "nodemonConfig": {
     "watch": [
