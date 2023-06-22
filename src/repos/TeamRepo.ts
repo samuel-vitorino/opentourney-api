@@ -1,6 +1,6 @@
 import { ITeam } from "@src/models/Team";
 import DB from "./DB";
-import { log } from "console";
+import Request from "@src/models/Request";
 
 // **** Functions **** //
 
@@ -203,8 +203,6 @@ async function add(team: ITeam): Promise<void> {
 
   const transactionClient = await DB.beginTransaction();
 
-  // console.log(team);
-
   let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
   let values: any = [team.name, team.owner.id, team.avatar];
   await DB.queryInTransaction(transactionClient, sql, values);
@@ -218,6 +216,14 @@ async function add(team: ITeam): Promise<void> {
   team.members?.forEach(async (member) => {
     sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
     values = [member.id, responseTeam.id];
+    await DB.queryInTransaction(transactionClient, sql, values);
+
+    let status = Request.RequestStatus.PENDING;
+    if (member.id === team.owner.id) {
+      status = Request.RequestStatus.ACCEPTED;
+    }
+    sql = "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, $3)";
+    values = [member.id, responseTeam.id, status];
     await DB.queryInTransaction(transactionClient, sql, values);
   });
 

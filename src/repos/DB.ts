@@ -19,7 +19,6 @@ async function query(sql: string, values?: any[]): Promise<any> {
   const client = await getClient();
   try {
     const result = await client.query(sql, values);
-    // console.log("<result>\n", result)
     return result.rows;
   } finally {
     client.release();

@@ -28,6 +28,10 @@ const Paths = {
     GetOne: "/teams/:id",
     GetAllByUser: "/users/:id/teams",
   },
+  Requests: {
+    Base: "/requests",
+    GetOne: "/requests/:id",
+  },
   Matches: {
     Base: "/matches",
     GetOne: "/matches/:id",
