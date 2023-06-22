@@ -46,6 +46,12 @@ async function getAll(): Promise<IUser[]> {
   return <IUser[]>rows;
 }
 
+async function getAllStandard(): Promise<IUser[]> {
+  const sql = "SELECT * FROM users WHERE role = 0";
+  const rows = await DB.query(sql);
+  return <IUser[]>rows;
+}
+
 /**
  * Get all users where name is like the given name.
  */
@@ -107,6 +113,7 @@ async function addSteamID(userId: number, steamID: string) {
 export default {
   getOne,
   getOneById,
+  getAllStandard,
   getAllByName,
   persists,
   getAll,

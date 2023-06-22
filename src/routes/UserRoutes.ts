@@ -5,6 +5,7 @@ import { IUser } from "@src/models/User";
 import { IReq, IRes } from "./types/express/misc";
 import SessionUtil from "@src/util/SessionUtil";
 import { ISessionUser } from "@src/models/User";
+import { log } from "console";
 
 // **** Functions **** //
 
@@ -14,11 +15,15 @@ import { ISessionUser } from "@src/models/User";
 async function getAll(req: IReq, res: IRes) {
   let users = null;
 
-  if (!req.query.name) {
-    users = await UserService.getAll();
-  } else {
+  log(req.query.role);
+
+  if (req.query.name) {
     const user = req.query.name as string;
     users = await UserService.getAllByName(user);
+  } else if (req.query.role) {
+    users = await UserService.getAllStandard();
+  } else {
+    users = await UserService.getAll();
   }
 
   return res.status(HttpStatusCodes.OK).json({ users });

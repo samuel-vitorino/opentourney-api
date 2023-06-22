@@ -59,7 +59,7 @@ apiRouter.use(Paths.Auth.Base, authRouter);
 const userRouter = Router();
 
 // Get all users
-userRouter.get(Paths.Users.Base, developerMw, UserRoutes.getAll);
+userRouter.get(Paths.Users.Base, UserRoutes.getAll);
 
 userRouter.get(Paths.Users.LoggedIn, UserRoutes.getLoggedIn);
 
@@ -135,7 +135,6 @@ teamRouter.get(Paths.Teams.Base, TeamRoutes.getAll);
 
 teamRouter.get(Paths.Teams.GetOne, TeamRoutes.getOne);
 
-
 // Add one team
 teamRouter.post(
   Paths.Teams.Base,
@@ -159,8 +158,6 @@ teamRouter.delete(
 
 // Add TeamRouter
 apiRouter.use(teamRouter);
-
-
 
 // ** Add RequestRouter ** //
 
@@ -186,8 +183,6 @@ requestRouter.put(
 
 // Add RequestRouter
 apiRouter.use(requestRouter);
-
-
 
 // ** Add MatchRouter ** //
 
