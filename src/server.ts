@@ -22,10 +22,19 @@ import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 import { NodeEnvs } from '@src/constants/misc';
 import { RouteError } from '@src/other/classes';
 
+import { JsonDatabase } from 'brackets-json-db';
+import { BracketsManager } from 'brackets-manager';
+
+
+const jsonStorage = new JsonDatabase();
+const manager = new BracketsManager(jsonStorage);
 
 // **** Variables **** //
 
 const app = express();
+
+app.locals.jsonStorage = jsonStorage;
+app.locals.manager = manager;
 
 // **** Setup **** //
 

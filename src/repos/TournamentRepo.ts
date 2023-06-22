@@ -1,4 +1,5 @@
 import { ITournament } from '@src/models/Tournament';
+import app from '@src/server';
 import DB from './DB';
 
 // **** Functions **** //
@@ -33,6 +34,10 @@ async function getOneById(id: number): Promise<ITournament | null> {
   }
 
   tournament.prizes = prizes;
+
+  if (tournament.status > 0) {
+    tournament.tournamentData = await app.locals.manager.get.tournamentData(id);
+  }
 
   return tournament
 }
@@ -118,8 +123,48 @@ async function update(tournament: ITournament): Promise<void> {
  * Update a tournament status.
  */
 async function updateStatus(id: number, status: number): Promise<void> {
-  const sql = 'UPDATE tournaments SET status = $1 WHERE id = $2';
-  await DB.query(sql, [status, id]);
+  const sql = 'UPDATE tournaments SET status = $1 WHERE id = $2 RETURNING *';
+  const tournament = <ITournament>(await DB.query(sql, [status, id]))[0];
+
+  if (status == 1) {
+    let type;
+    let name;
+
+    switch (tournament.stages) {
+      case 0: 
+      case 3:
+      case 4:
+        type = "round_robin";
+        name = "Group stage";
+        break;
+      case 1:
+        type = "single_elimination";
+        name = "Playoffs stage";
+        break;
+      case 2:
+        type = "double_elimination";
+        name = "Playoffs stage";
+        break;
+    }
+
+
+    await app.locals.manager.create({
+            tournamentId: id,
+            name: name,
+            type: type,
+            seeding: [
+                "Team 1",
+                "Team 2",
+                "Team 3",
+                "Team 4",
+                "Team 5",
+                "Team 6",
+                "Team 7",
+                "Team 8",
+            ],
+            settings: { grandFinal: "simple", groupCount: 2 },
+        });
+  }
 }
 
 /**

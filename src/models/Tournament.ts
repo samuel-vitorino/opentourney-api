@@ -1,5 +1,7 @@
 // **** Variables **** //
 
+import { Database } from "brackets-manager";
+
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
   'object with the appropriate user keys.';
 
@@ -24,6 +26,7 @@ export interface ITournament {
   status: number;
   stages: StageType;
   currentStage: number;
+  tournamentData?: Database;
   avatar?: string;
 }
 
@@ -42,6 +45,7 @@ function new_(
   status: number,
   stages: StageType,
   currentStage: number,
+  tournamentData?: Database,
   avatar?: string,
   id?: number, // id last cause usually set by db
 ): ITournament {
@@ -56,6 +60,7 @@ function new_(
     status: status,
     stages: stages,
     currentStage: currentStage,
+    tournamentData: tournamentData,
     avatar: (avatar ?? ''),
   };
 }
@@ -70,7 +75,7 @@ function from(param: object): ITournament {
   }
   // Get tournament instance
   const p = param as ITournament;
-  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.stages, p.currentStage, p.avatar, p.id);
+  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.stages, p.currentStage, p.tournamentData, p.avatar, p.id);
 }
 
 /**
