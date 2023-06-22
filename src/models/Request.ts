@@ -8,7 +8,7 @@ const INVALID_CONSTRUCTOR_PARAM =
 
 // **** Types **** //
 
-enum RequestStatus {
+export enum RequestStatus {
     PENDING = 0,
     ACCEPTED = 1,
     REJECTED = 2,

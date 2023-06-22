@@ -10,11 +10,11 @@ import Request from "@src/models/Request";
 
 async function getOneById(id: number): Promise<ITeam | null> {
   const sql = `
-      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
       FROM teams t
       LEFT JOIN users u1 ON t.owner = u1.id
-      LEFT JOIN teams_users tm ON t.id = tm.team_id
-      LEFT JOIN users u2 ON tm.user_id = u2.id
+      LEFT JOIN requests r ON t.id = r.team_id
+      LEFT JOIN users u2 ON r.user_id = u2.id
       WHERE t.id = $1
     `;
   const rows = await DB.query(sql, [id]);
@@ -45,12 +45,13 @@ async function getOneById(id: number): Promise<ITeam | null> {
       teams.push(team);
     }
 
-    if (row.member_id) {
+    if (row.member_id && row.member_status !== 2) {
       team.members?.push({
         id: row.member_id,
         name: row.member_name,
         avatar: row.member_avatar,
         email: row.member_email,
+        status: row.member_status,
       });
     }
   }
@@ -63,11 +64,11 @@ async function getOneById(id: number): Promise<ITeam | null> {
  */
 export const getAll = async (): Promise<ITeam[]> => {
   const sql = `
-      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
       FROM teams t
       LEFT JOIN users u1 ON t.owner = u1.id
-      LEFT JOIN teams_users tm ON t.id = tm.team_id
-      LEFT JOIN users u2 ON tm.user_id = u2.id
+      LEFT JOIN requests r ON t.id = r.team_id
+      LEFT JOIN users u2 ON r.user_id = u2.id
     `;
   const rows = await DB.query(sql);
   const teams: ITeam[] = [];
@@ -94,16 +95,17 @@ export const getAll = async (): Promise<ITeam[]> => {
       teams.push(team);
     }
 
-    if (row.member_id) {
+    if (row.member_id && row.member_status !== 2) {
       team.members?.push({
         id: row.member_id,
         name: row.member_name,
         avatar: row.member_avatar,
         email: row.member_email,
+        status: row.member_status,
       });
     }
   }
-  // log(teams);
+
   return teams;
 };
 
@@ -141,11 +143,11 @@ export const getAll = async (): Promise<ITeam[]> => {
 
 export const getAllByUserId = async (id: number): Promise<ITeam[]> => {
   const sql = `
-      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
       FROM teams t
       LEFT JOIN users u1 ON t.owner = u1.id
-      LEFT JOIN teams_users tm ON t.id = tm.team_id
-      LEFT JOIN users u2 ON tm.user_id = u2.id
+      LEFT JOIN requests r ON t.id = r.team_id
+      LEFT JOIN users u2 ON r.user_id = u2.id
       WHERE t.owner = $1
     `;
   const rows = await DB.query(sql, [id]);
@@ -173,16 +175,16 @@ export const getAllByUserId = async (id: number): Promise<ITeam[]> => {
       teams.push(team);
     }
 
-    if (row.member_id) {
+    if (row.member_id && row.member_status !== 2) {
       team.members?.push({
         id: row.member_id,
         name: row.member_name,
         avatar: row.member_avatar,
         email: row.member_email,
+        status: row.member_status,
       });
     }
   }
-  // log(teams);
   return teams;
 };
 
@@ -203,27 +205,27 @@ async function add(team: ITeam): Promise<void> {
 
   const transactionClient = await DB.beginTransaction();
 
-  let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3)";
+  let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3) RETURNING id";
   let values: any = [team.name, team.owner.id, team.avatar];
-  await DB.queryInTransaction(transactionClient, sql, values);
+  let id = (await DB.queryInTransaction(transactionClient, sql, values))[0].id;
 
-  sql = "SELECT * FROM teams WHERE name = $1";
-  values = [team.name];
-  let responseTeam = <ITeam>(
-    (await DB.queryInTransaction(transactionClient, sql, values))[0]
-  );
+  // sql = "SELECT * FROM teams WHERE name = $1";
+  // values = [team.name];
+  // let responseTeam = <ITeam>(
+  //   (await DB.queryInTransaction(transactionClient, sql, values))[0]
+  // );
 
   team.members?.forEach(async (member) => {
-    sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
-    values = [member.id, responseTeam.id];
-    await DB.queryInTransaction(transactionClient, sql, values);
+    // sql = "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
+    // values = [member.id, responseTeam.id];
+    // await DB.queryInTransaction(transactionClient, sql, values);
 
     let status = Request.RequestStatus.PENDING;
     if (member.id === team.owner.id) {
       status = Request.RequestStatus.ACCEPTED;
     }
     sql = "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, $3)";
-    values = [member.id, responseTeam.id, status];
+    values = [member.id, id, status];
     await DB.queryInTransaction(transactionClient, sql, values);
   });
 
@@ -240,23 +242,17 @@ async function update(team: ITeam): Promise<void> {
   const values_team = [team.name, team.owner.id, team.avatar, team.id];
   await DB.query(sql_team, values_team);
 
-  // team.members?.forEach(async (member) => {
-  //   const sql_team_users =
-  //     "UPDATE teams_users SET user_id = $1 WHERE team_id = $2 AND user_id = $3";
-  //   const values_team_users = [member.id, member.id, team.id];
-  //   await DB.query(sql_team_users, values_team_users);
-  // });
 
   // member id list
   let memberIds = team.members?.map((member) => member.id);
 
   if (memberIds?.length !== 0) {
     let params: string[] = [];
-    memberIds?.forEach((memberId, index) => {
+    memberIds?.forEach((_, index) => {
       params.push(`$` + (index + 2));
     });
     const sql_team_remove_users =
-      "SELECT id FROM teams_users WHERE team_id = $1 AND user_id NOT IN (" +
+      "SELECT id FROM requests WHERE team_id = $1 AND user_id NOT IN (" +
       params.join(",") +
       ")";
     const values_team_users = [team.id, ...memberIds!!];
@@ -265,7 +261,7 @@ async function update(team: ITeam): Promise<void> {
     let clientTransaction = await DB.beginTransaction();
 
     ids.forEach(async (id) => {
-      const sql_team_users = "DELETE FROM teams_users WHERE id = $1";
+      const sql_team_users = "DELETE FROM requests WHERE id = $1";
       const values_team_users = [id.id];
       await DB.queryInTransaction(
         clientTransaction,
@@ -273,27 +269,23 @@ async function update(team: ITeam): Promise<void> {
         values_team_users
       );
     });
-    DB.endTransaction(clientTransaction);
+    // DB.endTransaction(clientTransaction);
 
-    const sql_another = "SELECT user_id FROM teams_users WHERE team_id = $1";
+    const sql_another = "SELECT user_id FROM requests WHERE team_id = $1";
     const values = [team.id];
-    const rows = await DB.query(sql_another, values);
+    const rows = await DB.queryInTransaction(clientTransaction, sql_another, values);
 
     const newTeamMembers: number[] = memberIds!.filter((element) => {
       return !rows.some((item: any) => item.user_id === element);
     });
 
 
-    params = [];
-    newTeamMembers.forEach((newTeamMember, index) => {
-      params.push(`$` + (index + 2));
-    });
+    // clientTransaction = await DB.beginTransaction();
 
-    clientTransaction = await DB.beginTransaction();
-
+    //TODO fix new team members not being added
     newTeamMembers.forEach(async (id) => {
       const sql_team_users =
-        "INSERT INTO teams_users (user_id, team_id) VALUES ($1, $2)";
+        "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, 0)";
       const values_team_users = [id, team.id];
       await DB.queryInTransaction(
         clientTransaction,
