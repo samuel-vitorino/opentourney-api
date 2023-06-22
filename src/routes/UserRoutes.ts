@@ -13,7 +13,6 @@ import { ISessionUser } from "@src/models/User";
  */
 async function getAll(req: IReq, res: IRes) {
   let users = null;
-  console.log("ESTEVE AQUI");
 
   if (!req.query.name) {
     users = await UserService.getAll();

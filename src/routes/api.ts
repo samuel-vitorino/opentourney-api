@@ -16,6 +16,8 @@ import MatchRoutes from "./MatchRoutes";
 import Tournament from "@src/models/Tournament";
 import Team from "@src/models/Team";
 import Match from "@src/models/Match";
+import RequestRoutes from "./RequestRoutes";
+import Request from "@src/models/Request";
 
 // **** Variables **** //
 
@@ -157,6 +159,35 @@ teamRouter.delete(
 
 // Add TeamRouter
 apiRouter.use(teamRouter);
+
+
+
+// ** Add RequestRouter ** //
+
+const requestRouter = Router();
+
+// Get all requests
+requestRouter.get(Paths.Requests.Base, RequestRoutes.getAll);
+// requestRouter.get(Paths.Requests.GetOne, RequestRoutes.getOne);
+
+// Add one request
+requestRouter.post(
+  Paths.Requests.Base,
+  validate(["request", Request.isRequest]),
+  RequestRoutes.add
+);
+
+// Update one request
+requestRouter.put(
+  Paths.Requests.GetOne,
+  [validate(["request", Request.isRequest])],
+  RequestRoutes.update
+);
+
+// Add RequestRouter
+apiRouter.use(requestRouter);
+
+
 
 // ** Add MatchRouter ** //
 

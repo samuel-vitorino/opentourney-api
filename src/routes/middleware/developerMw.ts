@@ -25,16 +25,13 @@ type TSessionData = ISessionUser & JwtPayload;
  */
 async function developerMw(req: Request, res: Response, next: NextFunction) {
   // Get session data
-  console.log("ESTEVE AQUI Antes");
   const sessionData = await SessionUtil.getSessionData<TSessionData>(req);
-  console.log(sessionData);
 
   // Set session data to locals
   if (
     typeof sessionData === "object" &&
     sessionData?.role === UserRoles.Developer
   ) {
-    console.log("ESTEVE AQUI");
     res.locals.sessionUser = sessionData;
     return next();
     // Return an unauth error if user is not a developer
