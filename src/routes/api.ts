@@ -16,6 +16,7 @@ import MatchRoutes from './MatchRoutes';
 import Tournament from '@src/models/Tournament';
 import Team from '@src/models/Team';
 import Match from '@src/models/Match';
+import userTournamentMw from './middleware/userTournamentMw';
 
 // **** Variables **** //
 
@@ -70,6 +71,11 @@ userRouter.get(
 );
 
 userRouter.get(
+  Paths.Users.GetTournaments,
+  UserRoutes.getAllTournaments
+);
+
+userRouter.get(
   Paths.Users.GetOne,
   UserRoutes.getOne,
 );
@@ -111,6 +117,7 @@ tournamentRouter.get(
 
 tournamentRouter.get(
   Paths.Tournaments.GetOne,
+  [userTournamentMw],
   TournamentRoutes.getOne,
 );
 
@@ -124,14 +131,23 @@ tournamentRouter.post(
 // Update one tournament
 tournamentRouter.put(
   Paths.Tournaments.GetOne,
-  [validate(['tournament', Tournament.isTournament]), userDevMw],
+  [validate(['tournament', Tournament.isTournament]), userTournamentMw],
   TournamentRoutes.update,
+);
+
+
+
+// Update one tournament
+tournamentRouter.patch(
+  Paths.Tournaments.GetOne,
+  [userTournamentMw],
+  TournamentRoutes.updateStatus,
 );
 
 // Delete one tournament
 tournamentRouter.delete(
   Paths.Tournaments.GetOne,
-  [validate(['id', 'number', 'params']), userDevMw],
+  [validate(['id', 'number', 'params']), userTournamentMw],
   TournamentRoutes.delete,
 );
 

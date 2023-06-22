@@ -5,6 +5,7 @@ import { IUser } from '@src/models/User';
 import { IReq, IRes } from './types/express/misc';
 import SessionUtil from '@src/util/SessionUtil';
 import { ISessionUser } from '@src/models/User';
+import TournamentService from '@src/services/TournamentService';
 
 
 // **** Functions **** //
@@ -15,6 +16,11 @@ import { ISessionUser } from '@src/models/User';
 async function getAll(_: IReq, res: IRes) {
   const users = await UserService.getAll();
   return res.status(HttpStatusCodes.OK).json({ users });
+}
+
+async function getAllTournaments(req: IReq, res: IRes) {
+  const tournaments = await TournamentService.getAllByUser(+req.params.id);
+  return res.status(HttpStatusCodes.OK).json({ tournaments });
 }
 
 async function getOne(req: IReq, res: IRes) {
@@ -73,6 +79,7 @@ async function delete_(req: IReq, res: IRes) {
 
 export default {
   getAll,
+  getAllTournaments,
   getOne,
   getLoggedIn,
   add,

@@ -18,7 +18,8 @@ const Paths = {
   Users: {
     Base: '/users',
     GetOne: '/users/:id',
-    LoggedIn: '/users/me'
+    LoggedIn: '/users/me',
+    GetTournaments: '/users/:id/tournaments'
   },
   Tournaments: {
     Base: '/tournaments',

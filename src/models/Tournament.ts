@@ -10,6 +10,10 @@ export interface ITournament {
   name: string;
   admin: number;
   max_teams: number;
+  organizer: string;
+  information: string;
+  prizes: string[];
+  status: number;
   avatar?: string;
 }
 
@@ -22,6 +26,10 @@ function new_(
   name: string,
   admin: number,
   max_teams: number,
+  organizer: string,
+  information: string,
+  prizes: Array<string>,
+  status: number,
   avatar?: string,
   id?: number, // id last cause usually set by db
 ): ITournament {
@@ -30,6 +38,10 @@ function new_(
     name: name,
     admin: admin,
     max_teams: max_teams,
+    organizer: organizer,
+    information: information,
+    prizes: prizes,
+    status: status,
     avatar: (avatar ?? ''),
   };
 }
@@ -44,7 +56,7 @@ function from(param: object): ITournament {
   }
   // Get tournament instance
   const p = param as ITournament;
-  return new_(p.name, p.admin, p.max_teams, p.avatar, p.id);
+  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.avatar, p.id);
 }
 
 /**
@@ -54,10 +66,11 @@ function isTournament(arg: unknown): boolean {
   return (
     !!arg &&
     typeof arg === 'object' &&
-    'id' in arg &&
     'max_teams' in arg &&
     'name' in arg &&
-    'admin' in arg
+    'admin' in arg &&
+    'organizer' in arg &&
+    'information' in arg
   );
 }
 

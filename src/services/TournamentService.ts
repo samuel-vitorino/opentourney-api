@@ -18,6 +18,10 @@ function getAll(): Promise<ITournament[]> {
   return TournamentRepo.getAll();
 }
 
+function getAllByUser(id: number): Promise<ITournament[] | null> {
+  return TournamentRepo.getAllByUser(id);
+}
+
 function getOne(id: number): Promise<ITournament | null> {
   return TournamentRepo.getOneById(id);
 }
@@ -45,6 +49,21 @@ async function updateOne(tournament: ITournament): Promise<void> {
 }
 
 /**
+ * Update tournament status.
+ */
+async function updateStatus(id: number, status: number): Promise<void> {
+  const persists = await TournamentRepo.persists(id);
+  if (!persists) {
+    throw new RouteError(
+      HttpStatusCodes.NOT_FOUND,
+      TOURNAMENT_NOT_FOUND_ERR,
+    );
+  }
+  // Return tournament
+  return TournamentRepo.updateStatus(id, status);
+}
+
+/**
  * Delete a tournament by their id.
  */
 async function _delete(id: number): Promise<void> {
@@ -64,8 +83,10 @@ async function _delete(id: number): Promise<void> {
 
 export default {
   getAll,
+  getAllByUser,
   getOne,
   addOne,
   updateOne,
+  updateStatus,
   delete: _delete,
 } as const;
