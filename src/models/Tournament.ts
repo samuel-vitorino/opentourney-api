@@ -1,15 +1,32 @@
 // **** Variables **** //
 
+import { Database } from "brackets-manager";
+
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
   'object with the appropriate user keys.';
 
 // **** Types **** //
+
+enum StageType {
+  roundRobin,
+  singleElimination,
+  doubleElimination,
+  roundRobinSingleElimination,
+  roundRobinDoubleElimination
+}
 
 export interface ITournament {
   id: number;
   name: string;
   admin: number;
   max_teams: number;
+  organizer: string;
+  information: string;
+  prizes: string[];
+  status: number;
+  stages: StageType;
+  currentStage: number;
+  tournamentData?: Database;
   avatar?: string;
 }
 
@@ -22,6 +39,13 @@ function new_(
   name: string,
   admin: number,
   max_teams: number,
+  organizer: string,
+  information: string,
+  prizes: Array<string>,
+  status: number,
+  stages: StageType,
+  currentStage: number,
+  tournamentData?: Database,
   avatar?: string,
   id?: number, // id last cause usually set by db
 ): ITournament {
@@ -30,6 +54,13 @@ function new_(
     name: name,
     admin: admin,
     max_teams: max_teams,
+    organizer: organizer,
+    information: information,
+    prizes: prizes,
+    status: status,
+    stages: stages,
+    currentStage: currentStage,
+    tournamentData: tournamentData,
     avatar: (avatar ?? ''),
   };
 }
@@ -44,7 +75,7 @@ function from(param: object): ITournament {
   }
   // Get tournament instance
   const p = param as ITournament;
-  return new_(p.name, p.admin, p.max_teams, p.avatar, p.id);
+  return new_(p.name, p.admin, p.max_teams, p.organizer, p.information, p.prizes, p.status, p.stages, p.currentStage, p.tournamentData, p.avatar, p.id);
 }
 
 /**
@@ -54,10 +85,11 @@ function isTournament(arg: unknown): boolean {
   return (
     !!arg &&
     typeof arg === 'object' &&
-    'id' in arg &&
     'max_teams' in arg &&
     'name' in arg &&
-    'admin' in arg
+    'admin' in arg &&
+    'organizer' in arg &&
+    'information' in arg
   );
 }
 

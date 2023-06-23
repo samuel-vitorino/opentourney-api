@@ -1,12 +1,12 @@
 exports.up = pgm => {
-    pgm.createTable('teams', {
+    pgm.createTable('prizes', {
         id: 'id',
-        name: { type: 'varchar(1000)', notNull: true, unique: true },
-        avatar: { type: 'varchar(1000)' },
-        owner: {
+        prize: { type: 'varchar(1000)', notNull: true },
+        rank: { type: 'smallint', notNull: true, default: 0 },
+        tournament: {
             type: 'integer',
             notNull: true,
-            references: '"users"',
+            references: '"tournaments"',
             onDelete: 'cascade',
         },
         createdAt: {

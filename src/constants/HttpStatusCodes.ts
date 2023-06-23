@@ -123,7 +123,7 @@ enum HttpStatusCodes {
     SEE_OTHER = 303,
 
     /**
-     * Indicates that the resource has not been modified since the version specified by the request headers If-Modified-Since or If-None-Match.
+     * Indicates that the resource has not been modified since the version specified by the request headers If-Modified-Since or If-None-Game.
      * In such case, there is no need to retransmit the resource since the client still has a previously-downloaded copy.
      */
     NOT_MODIFIED = 304,

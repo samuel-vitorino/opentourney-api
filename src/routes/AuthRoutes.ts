@@ -1,9 +1,8 @@
-import HttpStatusCodes from '@src/constants/HttpStatusCodes';
-import SessionUtil from '@src/util/SessionUtil';
-import AuthService from '@src/services/AuthService';
+import HttpStatusCodes from "@src/constants/HttpStatusCodes";
+import SessionUtil from "@src/util/SessionUtil";
+import AuthService from "@src/services/AuthService";
 
-import { IReq, IRes } from './types/express/misc';
-
+import { IReq, IRes } from "./types/express/misc";
 
 // **** Types **** //
 
@@ -11,7 +10,6 @@ interface ILoginReq {
   email: string;
   pwd: string;
 }
-
 
 // **** Functions **** //
 
@@ -24,8 +22,9 @@ async function login(req: IReq<ILoginReq>, res: IRes) {
   const user = await AuthService.login(email, pwd);
   // Setup Cookie
   const userDetails = {
-    id: user.id
-  }
+    id: user.id,
+    role: user.role,
+  };
   await SessionUtil.addSessionData(res, userDetails);
   // Return
   return res.status(HttpStatusCodes.OK).json({
@@ -34,7 +33,7 @@ async function login(req: IReq<ILoginReq>, res: IRes) {
     name: user.name,
     avatar: user.avatar,
     role: user.role,
-    steamid: user.steamid
+    steamid: user.steamid,
   });
 }
 
@@ -45,7 +44,6 @@ function logout(_: IReq, res: IRes) {
   SessionUtil.clearCookie(res);
   return res.status(HttpStatusCodes.OK).end();
 }
-
 
 // **** Export default **** //
 
