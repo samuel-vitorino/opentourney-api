@@ -50,8 +50,8 @@ async function persists(id: number): Promise<boolean> {
  * Add one match.
  */
 async function add(match: IMatch): Promise<void> {
-  const sql = 'INSERT INTO matches (type, tournament, team_one, team_two) VALUES ($1, $2, $3. $4)';
-  const values = [match.type, match.tournament, match.team_one, match.team_two];
+  const sql = 'INSERT INTO matches (type, tournament, team_one, team_two, status, manager_id) VALUES ($1, $2, $3, $4, COALESCE($5, 0), $6)';
+  const values = [match.type, match.tournament, match.team_one, match.team_two, match.status, match.manager_id];
   await DB.query(sql, values);
 }
 

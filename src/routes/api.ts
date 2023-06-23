@@ -110,9 +110,28 @@ tournamentRouter.get(
 
 tournamentRouter.get(
   Paths.Tournaments.GetOne,
-  [userTournamentMw],
   TournamentRoutes.getOne,
 );
+
+tournamentRouter.get(
+  Paths.Tournaments.GetTeams,
+  TournamentRoutes.getTeams,
+);
+
+tournamentRouter.get(
+  Paths.Tournaments.GetMatches,
+  TournamentRoutes.getMatches,
+);
+
+tournamentRouter.post(
+  Paths.Tournaments.GetTeams,
+  TournamentRoutes.addTeam
+)
+
+tournamentRouter.delete(
+  Paths.Tournaments.DeleteTeam,
+  TournamentRoutes.removeTeam
+)
 
 // Add one tournament
 tournamentRouter.post(

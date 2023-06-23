@@ -23,6 +23,9 @@ const Paths = {
   Tournaments: {
     Base: "/tournaments",
     GetOne: "/tournaments/:id",
+    GetTeams: "/tournaments/:id/teams",
+    GetMatches: "/tournaments/:id/matches",
+    DeleteTeam: "/tournaments/:id/teams/:team_id",
   },
   Teams: {
     Base: "/teams",

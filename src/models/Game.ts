@@ -13,6 +13,7 @@ export interface IGame {
   team_two_score?: number;
   connect_ip?: string;
   map?: string;
+  manager_id?: number;
 }
 
 // **** Functions **** //
@@ -27,6 +28,7 @@ function new_(
   team_two_score?: number,
   connect_ip?: string,
   map?: string,
+  manager_id?: number,
   id?: number, // id last cause usually set by db
 ): IGame {
   return {
@@ -37,6 +39,7 @@ function new_(
     team_two_score: (team_two_score ?? 0),
     connect_ip: (connect_ip ?? ''),
     map: (map ?? ''),
+    manager_id: manager_id
   };
 }
 

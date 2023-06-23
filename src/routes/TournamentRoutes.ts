@@ -25,6 +25,44 @@ async function getOne(req: IReq, res: IRes) {
   }
 }
 
+async function getTeams(req: IReq, res: IRes) {
+  try {
+    const tournament = await TournamentService.getTeams(+req.params.id);
+    return res.status(HttpStatusCodes.OK).json({ tournament });
+  } catch(error) {
+    return res.status(HttpStatusCodes.BAD_REQUEST);
+  }
+}
+
+async function getMatches(req: IReq, res: IRes) {
+  try {
+    const tournament = await TournamentService.getMatches(+req.params.id);
+    return res.status(HttpStatusCodes.OK).json({ tournament });
+  } catch(error) {
+    return res.status(HttpStatusCodes.BAD_REQUEST);
+  }
+}
+
+async function addTeam(req: IReq<{team: number}>, res: IRes) {
+  const { team } = req.body;
+
+  try {
+    const tournament = await TournamentService.addTeam(+req.params.id, team);
+    return res.status(HttpStatusCodes.OK).json({ tournament });
+  } catch(error) {
+    return res.status(HttpStatusCodes.BAD_REQUEST);
+  }
+}
+
+async function removeTeam(req: IReq, res: IRes) {
+  try {
+    const tournament = await TournamentService.removeTeam(+req.params.id, +req.params.team_id);
+    return res.status(HttpStatusCodes.OK).json({ tournament });
+  } catch(error) {
+    return res.status(HttpStatusCodes.BAD_REQUEST);
+  }
+}
+
 /**
  * Add one tournament.
  */
@@ -125,6 +163,10 @@ async function delete_(req: IReq, res: IRes) {
 export default {
   getAll,
   getOne,
+  getTeams,
+  getMatches,
+  addTeam,
+  removeTeam,
   add,
   update,
   updateStatus,

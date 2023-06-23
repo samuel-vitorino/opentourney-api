@@ -1,6 +1,10 @@
 import { ITournament } from '@src/models/Tournament';
+import { ITeam } from '@src/models/Team';
+import { IMatch } from '@src/models/Match';
 import app from '@src/server';
 import DB from './DB';
+import MatchRepo from './MatchRepo';
+import { IGame } from '@src/models/Game';
 
 // **** Functions **** //
 
@@ -49,6 +53,79 @@ async function getAll(): Promise<ITournament[]> {
   const sql = 'SELECT * FROM tournaments';
   const rows = await DB.query(sql);
   return <ITournament[]>rows;
+}
+
+/**
+ * Get matches.
+ */
+async function getMatches(id: number): Promise<IMatch[]> {
+  let sql = 'SELECT m.*, t1.name as team_one_name, t2.name as team_two_name FROM matches m LEFT JOIN teams as t1 ON m.team_one = t1.id LEFT JOIN teams as t2 ON m.team_two = t2.id WHERE m.tournament = $1';
+  let rows = <IMatch[]>await DB.query(sql, [id]);
+
+  for (let i = 0; i < rows.length; i++) {
+    let sql_games = 'SELECT * FROM games WHERE match = $1';
+    let games = <IGame[]>await DB.query(sql_games, [rows[i].id]);
+    rows[i].games = games;
+  }
+
+  return rows;
+}
+
+/**
+ * Get teams.
+ */
+async function getTeams(id: number): Promise<ITeam[]> {
+  const sql = `
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
+      FROM teams t
+      LEFT JOIN tournaments_teams as tt ON t.id = tt.team
+      LEFT JOIN users u1 ON t.owner = u1.id
+      LEFT JOIN requests r ON t.id = r.team_id
+      LEFT JOIN users u2 ON r.user_id = u2.id
+      WHERE tt.tournament = $1
+    `;
+  const rows = await DB.query(sql, [id]);
+  
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id && row.member_status !== 2) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+        status: row.member_status,
+      });
+    }
+  }
+
+  return teams;
 }
 
 async function getAllByUser(id: number): Promise<ITournament[]> {
@@ -102,6 +179,26 @@ async function add(tournament: ITournament): Promise<void> {
 }
 
 /**
+ * Add team to tournament.
+ */
+async function addTeam(id: number, team: Number): Promise<void> {
+  const sql = 'INSERT INTO tournaments_teams (tournament, team) VALUES ($1, $2)';
+  const values = [id, team];
+  
+  await DB.query(sql, values);
+}
+
+/**
+ * Remove team from tournament.
+ */
+async function removeTeam(id: number, team: Number): Promise<void> {
+  const sql = 'DELETE FROM tournaments_teams WHERE tournament = $1 AND team = $2';
+  const values = [id, team];
+  
+  await DB.query(sql, values);
+}
+
+/**
  * Update a tournament.
  */
 async function update(tournament: ITournament): Promise<void> {
@@ -118,6 +215,44 @@ async function update(tournament: ITournament): Promise<void> {
   }
 }
 
+function calculateNumberOfGroups(numTeams: number): number {
+  if (numTeams % 3 === 0) {
+    const numGroups = numTeams / 3;
+    return numGroups;
+  } else if (numTeams % 4 === 0) {
+    const numGroups = numTeams / 4;
+    return numGroups;
+  } else {
+    let numGroups4 = Math.floor(numTeams / 4);
+    while (numGroups4 > 0) {
+      const remainingTeams = numTeams - numGroups4 * 4;
+      if (remainingTeams % 3 === 0) {
+        const numGroups3 = remainingTeams / 3;
+        return numGroups4 + numGroups3;
+      }
+      numGroups4--;
+    }
+  }
+  return -1;
+}
+
+function shuffle(array: Array<string>) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
 
 /**
  * Update a tournament status.
@@ -147,23 +282,73 @@ async function updateStatus(id: number, status: number): Promise<void> {
         break;
     }
 
+    await app.locals.manager.delete.tournament(id);
+
+    interface Config {
+      grandFinal: string;
+      groupCount?: number;
+      size?: number;
+    }
+
+    let config: Config = {grandFinal: "simple"}
+    let teams = (await getTeams(tournament.id));
+    const teamNames: string[] = teams.map((t) => t.name);
+
+    shuffle(teamNames);
+
+    if (type == "round_robin") {
+      config.groupCount = calculateNumberOfGroups(teams.length);
+      config.size = teams.length;
+    }
 
     await app.locals.manager.create({
             tournamentId: id,
             name: name,
             type: type,
-            seeding: [
-                "Team 1",
-                "Team 2",
-                "Team 3",
-                "Team 4",
-                "Team 5",
-                "Team 6",
-                "Team 7",
-                "Team 8",
-            ],
-            settings: { grandFinal: "simple", groupCount: 2 },
+            seeding: teamNames,
+            settings: config,
         });
+    
+    const participants = await app.locals.jsonStorage.select('participant', {tournament_id: id})
+
+    interface Participant {
+      name: string;
+      id: number;
+    }
+
+    const idToTeamId: { [key: number]: number } = {};
+
+    participants.forEach((p: Participant) => {
+      teams.forEach((t) => {
+        if (t.name == p.name) {
+          idToTeamId[p.id] = t.id;
+        }
+      })
+    })
+
+    
+    const currentStage = await app.locals.manager.get.currentStage(id);
+    const currentRound = await app.locals.manager.get.currentRound(currentStage.id);
+    const matches = await app.locals.jsonStorage.select('match', { round_id: currentRound.id });
+    
+    interface Match {
+      id: number;
+      opponent1: Participant,
+      opponent2: Participant
+    }
+
+    for (let i = 0; i < matches.length; i++) {
+      let m = matches[i] as Match;
+      let match = {
+        type: type == "round_robin" ? 0 : 1,
+        currentGame: 0,
+        tournament: id,
+        team_one: idToTeamId[m.opponent1.id],
+        team_two: idToTeamId[m.opponent2.id],
+        manager_id: m.id
+      } as IMatch;
+      MatchRepo.add(match);
+    }
   }
 }
 
@@ -184,6 +369,10 @@ export default {
   getOneById,
   getAll,
   getAllByUser,
+  getMatches,
+  getTeams,
+  addTeam,
+  removeTeam,
   persists,
   add,
   update,

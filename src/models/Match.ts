@@ -18,8 +18,12 @@ export interface IMatch {
   currentGame: number;
   tournament: number;
   team_one: number;
+  status: number;
+  team_one_name?: string;
   team_two: number;
+  team_two_name?: string;
   games: IGame[];
+  manager_id?:  number;
 }
 
 // **** Functions **** //
@@ -33,7 +37,11 @@ function new_(
   tournament: number,
   team_one: number,
   team_two: number,
+  status: number,
   games: IGame[],
+  manager_id?: number,
+  team_one_name?: string,
+  team_two_name?: string,
   id?: number, // id last cause usually set by db
 ): IMatch {
   return {
@@ -43,7 +51,11 @@ function new_(
     tournament: tournament,
     team_one: team_one,
     team_two: team_two,
-    games: games
+    status: status,
+    games: games,
+    manager_id: manager_id,
+    team_one_name: team_one_name,
+    team_two_name: team_two_name,
   };
 }
 
@@ -57,7 +69,7 @@ function from(param: object): IMatch {
   }
   // Get game instance
   const p = param as IMatch;
-  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.games, p.id);
+  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.status, p.games, p.id);
 }
 
 /**
