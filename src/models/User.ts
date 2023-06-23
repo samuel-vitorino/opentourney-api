@@ -1,6 +1,8 @@
 // **** Variables **** //
 
-const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
+import { RequestStatus } from "./Request";
+
+const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' +
   'object with the appropriate user keys.';
 
 export enum UserRoles {
@@ -19,6 +21,7 @@ export interface IUser {
   steamid?: string;
   pwd?: string;
   role?: UserRoles;
+  status?: RequestStatus;
 }
 
 export interface ISessionUser {
@@ -38,6 +41,7 @@ function new_(
   pwd?: string,
   avatar?: string,
   steamid?: string,
+  status?: number,
   id?: number, // id last cause usually set by db
 ): IUser {
   return {
@@ -47,7 +51,8 @@ function new_(
     role: (role ?? UserRoles.Standard),
     pwd: (pwd ?? ''),
     avatar: (avatar ?? ''),
-    steamid: (steamid ?? '')
+    steamid: (steamid ?? ''),
+    status: (status ?? RequestStatus.PENDING)
   };
 }
 

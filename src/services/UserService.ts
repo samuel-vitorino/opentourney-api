@@ -22,6 +22,14 @@ function getOne(id: number): Promise<IUser | null> {
   return UserRepo.getOneById(id);
 }
 
+function getAllByName(name: string): Promise<IUser[]> {
+  return UserRepo.getAllByName(name);
+}
+
+function getAllStandard(): Promise<IUser[]> {
+  return UserRepo.getAllStandard();
+}
+
 /**
  * Add one user.
  */
@@ -65,6 +73,8 @@ async function _delete(id: number): Promise<void> {
 export default {
   getAll,
   getOne,
+  getAllByName,
+  getAllStandard,
   addOne,
   updateOne,
   delete: _delete,

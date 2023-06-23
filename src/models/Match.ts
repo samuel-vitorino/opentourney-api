@@ -1,17 +1,31 @@
 // **** Variables **** //
 
+import { IGame } from "./Game";
+import { ITeam } from "./Team";
+
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
   'object with the appropriate user keys.';
+
+enum MatchType {
+    BO1,
+    BO3
+}
 
 // **** Types **** //
 
 export interface IMatch {
   id: number;
+  type: MatchType;
+  currentGame: number;
+  tournament: number;
+  team_one: number;
   status: number;
-  team_1: number;
-  team_2: number;
-  connect_ip?: string;
-  map?: string;
+  team_one_name?: string;
+  team_two: number;
+  team_two_name?: string;
+  teams?: ITeam[];
+  games: IGame[];
+  manager_id?:  number;
 }
 
 // **** Functions **** //
@@ -20,20 +34,32 @@ export interface IMatch {
  * Create new Match.
  */
 function new_(
+  type: MatchType,
+  currentGame: number,
+  tournament: number,
+  team_one: number,
+  team_two: number,
   status: number,
-  team_1: number,
-  team_2: number,
-  connect_ip?: string,
-  map?: string,
+  games: IGame[],
+  manager_id?: number,
+  team_one_name?: string,
+  team_two_name?: string,
+  teams?: ITeam[],
   id?: number, // id last cause usually set by db
 ): IMatch {
   return {
     id: (id ?? -1),
+    type: type,
+    currentGame: currentGame,
+    tournament: tournament,
+    team_one: team_one,
+    team_two: team_two,
     status: status,
-    team_1: team_1,
-    team_2: team_2,
-    connect_ip: (connect_ip ?? ''),
-    map: (map ?? ''),
+    games: games,
+    manager_id: manager_id,
+    team_one_name: team_one_name,
+    team_two_name: team_two_name,
+    teams: teams,
   };
 }
 
@@ -41,13 +67,13 @@ function new_(
  * Get match instance from object.
  */
 function from(param: object): IMatch {
-  // Check is match
+  // Check is game
   if (!isMatch(param)) {
     throw new Error(INVALID_CONSTRUCTOR_PARAM);
   }
-  // Get match instance
+  // Get game instance
   const p = param as IMatch;
-  return new_(p.status, p.team_1, p.team_2, p.connect_ip, p.map, p.id);
+  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.status, p.games, p.id);
 }
 
 /**
@@ -57,10 +83,10 @@ function isMatch(arg: unknown): boolean {
   return (
     !!arg &&
     typeof arg === 'object' &&
-    'id' in arg &&
-    'status' in arg &&
-    'team_1' in arg &&
-    'team_2' in arg
+    'type' in arg &&
+    'tournament' in arg &&
+    'team_one' in arg &&
+    'team_two' in arg
   );
 }
 

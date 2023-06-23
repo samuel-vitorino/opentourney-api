@@ -1,29 +1,25 @@
 exports.up = pgm => {
-    pgm.createTable('matches', {
+    pgm.createTable('requests', {
         id: 'id',
-        manager_id: { type: 'smallint', notNull: true, default: 0 },
-        status: { type: 'smallint', default: 0 },
-        type: { type: 'smallint', notNull: true, default: 0 },
-        currentGame: { type: 'smallint', notNull: true, default: 0 },
-        tournament: {
+        user_id: {
             type: 'integer',
             notNull: true,
-            references: '"tournaments"',
+            references: '"users"',
             onDelete: 'cascade',
         },
-        team_one: {
+        team_id: {
             type: 'integer',
             notNull: true,
             references: '"teams"',
             onDelete: 'cascade',
         },
-        team_two: {
+        status: {
             type: 'integer',
             notNull: true,
-            references: '"teams"',
+            default: 0,
             onDelete: 'cascade',
         },
-        createdAt: {
+        createdat: {
             type: 'timestamp',
             notNull: true,
             default: pgm.func('current_timestamp'),
