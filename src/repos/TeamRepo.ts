@@ -226,6 +226,7 @@ async function add(team: ITeam, isAdmin: boolean = false): Promise<void> {
     if (isAdmin || member.id === team.owner.id) {
       status = Request.RequestStatus.ACCEPTED;
     }
+
     sql = "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, $3)";
     values = [member.id, id, status];
     await DB.queryInTransaction(transactionClient, sql, values);
@@ -307,7 +308,6 @@ async function update(team: ITeam, isAdmin: boolean = false): Promise<void> {
  * Delete one team.
  */
 async function delete_(id: number): Promise<void> {
-  log(`Deleting team ${id}`);
   const sql_requests = "DELETE FROM requests WHERE team_id = $1";
   const values_requests = [id];
   await DB.query(sql_requests, values_requests);
