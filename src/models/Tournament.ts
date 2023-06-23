@@ -89,9 +89,7 @@ function isTournament(arg: unknown): boolean {
     'name' in arg &&
     'admin' in arg &&
     'organizer' in arg &&
-    'information' in arg &&
-    'stages' in arg &&
-    'currentStage' in arg
+    'information' in arg
   );
 }
 

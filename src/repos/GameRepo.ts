@@ -40,8 +40,8 @@ async function persists(id: number): Promise<boolean> {
  * Add one game.
  */
 async function add(game: IGame): Promise<void> {
-  const sql = 'INSERT INTO games (status, match, connect_ip, map) VALUES ($1, $2, $3. $4)';
-  const values = [game.status, game.match, game.connect_ip, game.map];
+  const sql = 'INSERT INTO games (status, match, connect_ip, map, manager_id) VALUES ($1, $2, $3. $4, $5)';
+  const values = [game.status, game.match, game.connect_ip, game.map, game.manager_id];
   await DB.query(sql, values);
 }
 

@@ -1,6 +1,7 @@
 // **** Variables **** //
 
 import { IGame } from "./Game";
+import { ITeam } from "./Team";
 
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' + 
   'object with the appropriate user keys.';
@@ -18,14 +19,19 @@ export interface IMatch {
   currentGame: number;
   tournament: number;
   team_one: number;
+  status: number;
+  team_one_name?: string;
   team_two: number;
+  team_two_name?: string;
+  teams?: ITeam[];
   games: IGame[];
+  manager_id?:  number;
 }
 
 // **** Functions **** //
 
 /**
- * Create new Game.
+ * Create new Match.
  */
 function new_(
   type: MatchType,
@@ -33,7 +39,12 @@ function new_(
   tournament: number,
   team_one: number,
   team_two: number,
+  status: number,
   games: IGame[],
+  manager_id?: number,
+  team_one_name?: string,
+  team_two_name?: string,
+  teams?: ITeam[],
   id?: number, // id last cause usually set by db
 ): IMatch {
   return {
@@ -43,12 +54,17 @@ function new_(
     tournament: tournament,
     team_one: team_one,
     team_two: team_two,
-    games: games
+    status: status,
+    games: games,
+    manager_id: manager_id,
+    team_one_name: team_one_name,
+    team_two_name: team_two_name,
+    teams: teams,
   };
 }
 
 /**
- * Get game instance from object.
+ * Get match instance from object.
  */
 function from(param: object): IMatch {
   // Check is game
@@ -57,11 +73,11 @@ function from(param: object): IMatch {
   }
   // Get game instance
   const p = param as IMatch;
-  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.games, p.id);
+  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.status, p.games, p.id);
 }
 
 /**
- * See if the param meets criteria to be a game.
+ * See if the param meets criteria to be a match.
  */
 function isMatch(arg: unknown): boolean {
   return (
