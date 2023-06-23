@@ -16,8 +16,8 @@ async function getAll(_: IReq, res: IRes) {
 
 async function getOne(req: IReq, res: IRes) {
   try {
-    const game = await MatchService.getOne(+req.params.id);
-    return res.status(HttpStatusCodes.OK).json({ game });
+    const match = await MatchService.getOne(+req.params.id);
+    return res.status(HttpStatusCodes.OK).json({ match });
   } catch(error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
   }
@@ -26,18 +26,18 @@ async function getOne(req: IReq, res: IRes) {
 /**
  * Add one match.
  */
-async function add(req: IReq<{game: IMatch}>, res: IRes) {
-  const { game } = req.body;
-  await MatchService.addOne(game);
+async function add(req: IReq<{match: IMatch}>, res: IRes) {
+  const { match } = req.body;
+  await MatchService.addOne(match);
   return res.status(HttpStatusCodes.CREATED).end();
 }
 
 /**
  * Update one match.
  */
-async function update(req: IReq<{game: IMatch}>, res: IRes) {
-  const { game } = req.body;
-  await MatchService.updateOne(game);
+async function update(req: IReq<{match: IMatch}>, res: IRes) {
+  const { match } = req.body;
+  await MatchService.updateOne(match);
   return res.status(HttpStatusCodes.OK).end();
 }
 

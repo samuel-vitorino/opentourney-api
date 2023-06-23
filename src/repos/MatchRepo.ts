@@ -1,5 +1,6 @@
 import { IGame } from '@src/models/Game';
 import { IMatch } from '@src/models/Match';
+import { ITeam } from '@src/models/Team';
 import DB from './DB';
 
 // **** Functions **** //
@@ -9,7 +10,7 @@ import DB from './DB';
  */
 
 async function getOneById(id: number): Promise<IMatch | null> {
-  let sql = 'SELECT * FROM matches WHERE id = $1';
+  let sql = 'SELECT m.*, t1.name as team_one_name, t2.name as team_two_name FROM matches m LEFT JOIN teams as t1 ON m.team_one = t1.id LEFT JOIN teams as t2 ON m.team_two = t2.id WHERE m.id = $1';
   let rows = await DB.query(sql, [id]);
 
   if (rows.length === 0) {
@@ -24,6 +25,66 @@ async function getOneById(id: number): Promise<IMatch | null> {
   if (rows.length > 0) {
     match.games = <IGame[]>rows;
   }
+  
+  sql = `
+      SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
+      FROM teams t
+      LEFT JOIN users u1 ON t.owner = u1.id
+      LEFT JOIN requests r ON t.id = r.team_id
+      LEFT JOIN users u2 ON r.user_id = u2.id
+      WHERE t.id = $1 OR t.id = $2
+    `;
+  rows = await DB.query(sql, [match.team_one, match.team_two]);
+  
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id && row.member_status !== 2) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+        status: row.member_status,
+      });
+    }
+  }
+
+  let final_teams: Array<ITeam> = [];
+  
+  if (match.team_one != teams[0].id) {
+    final_teams[0] = teams[1];
+    final_teams[1] = teams[0];
+  } else {
+    final_teams = teams;
+  }
+
+  match.teams = final_teams;
 
   return match;
 }
