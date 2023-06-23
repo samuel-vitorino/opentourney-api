@@ -37,6 +37,7 @@ const Paths = {
     GetOne: "/requests/:id",
   },
   Matches: {
+    GetAll: '/matches',
     GetOne: '/matches/:id'
   },
 };

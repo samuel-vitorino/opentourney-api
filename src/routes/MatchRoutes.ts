@@ -10,8 +10,8 @@ import { IReq, IRes } from './types/express/misc';
  * Get all matches.
  */
 async function getAll(_: IReq, res: IRes) {
-  const games = await MatchService.getAll();
-  return res.status(HttpStatusCodes.OK).json({ games });
+  const matches = await MatchService.getAll();
+  return res.status(HttpStatusCodes.OK).json({ matches });
 }
 
 async function getOne(req: IReq, res: IRes) {
