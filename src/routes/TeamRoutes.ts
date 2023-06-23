@@ -7,7 +7,8 @@ import { log } from "console";
 import SessionUtil from "@src/util/SessionUtil";
 import { ISessionUser, UserRoles } from "@src/models/User";
 import { JwtPayload } from "jsonwebtoken";
-
+import fs from 'fs';
+import path from 'path';
 
 
 type TSessionData = ISessionUser & JwtPayload;
@@ -72,6 +73,33 @@ async function getAll(req: IReq, res: IRes) {
  */
 async function add(req: IReq<{ team: ITeam }>, res: IRes) {
   const { team } = req.body;
+
+  if (team.avatar) {
+    const games = team.avatar.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    if (!games || games.length !== 3) {
+      return res.status(400).send('Invalid base64 image data.');
+    }
+
+    const imageExtension = games[1].split('/')[1];
+    const base64Image = games[2];
+
+    // Generate a unique filename for the image
+    const filename = `${Date.now()}_${team.name}.${imageExtension}`;
+
+    // Save the image to the server
+    const imagePath = path.join(__dirname, '../../public/images', filename);
+    fs.writeFile(imagePath, base64Image, { encoding: 'base64' }, (err) => {
+      if (err) {
+        console.log('Error:', err);
+        return res.status(500).send('An error occurred while saving the image.');
+      }
+      console.log('Image saved successfully.');
+      return res.status(200).send('Image saved successfully.');
+    });
+
+    team.avatar = filename;
+  }
+
   await TeamService.addOne(team, await isAdmin(req));
   return res.status(HttpStatusCodes.CREATED).end();
 }
@@ -81,6 +109,34 @@ async function add(req: IReq<{ team: ITeam }>, res: IRes) {
  */
 async function update(req: IReq<{ team: ITeam }>, res: IRes) {
   const { team } = req.body;
+
+  if (team.avatar) {
+    const games = team.avatar!.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    if (!games || games.length !== 3) {
+      return res.status(400).send('Invalid base64 image data.');
+    }
+
+    const imageExtension = games[1].split('/')[1];
+    const base64Image = games[2];
+
+    // Generate a unique filename for the image
+    const filename = `${Date.now()}_${team.name}.${imageExtension}`;
+
+    // Save the image to the server
+    const imagePath = path.join(__dirname, '../../public/images', filename);
+    fs.writeFile(imagePath, base64Image, { encoding: 'base64' }, (err) => {
+      if (err) {
+        console.log('Error:', err);
+        return res.status(500).send('An error occurred while saving the image.');
+      }
+      console.log('Image saved successfully.');
+      return res.status(200).send('Image saved successfully.');
+    });
+
+    team.avatar = filename;
+  }
+
+
   await TeamService.updateOne(team, await isAdmin(req));
   return res.status(HttpStatusCodes.OK).end();
 }

@@ -20,7 +20,7 @@ async function getOne(req: IReq, res: IRes) {
   try {
     const tournament = await TournamentService.getOne(+req.params.id);
     return res.status(HttpStatusCodes.OK).json({ tournament });
-  } catch(error) {
+  } catch (error) {
     return res.status(HttpStatusCodes.BAD_REQUEST);
   }
 }
@@ -28,9 +28,9 @@ async function getOne(req: IReq, res: IRes) {
 /**
  * Add one tournament.
  */
-async function add(req: IReq<{tournament: ITournament}>, res: IRes) {
+async function add(req: IReq<{ tournament: ITournament }>, res: IRes) {
   const { tournament } = req.body;
-  
+
   if (tournament.avatar) {
     const games = tournament.avatar.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
     if (!games || games.length !== 3) {
@@ -63,7 +63,7 @@ async function add(req: IReq<{tournament: ITournament}>, res: IRes) {
 /**
  * Update one tournament.
  */
-async function update(req: IReq<{tournament: ITournament}>, res: IRes) {
+async function update(req: IReq<{ tournament: ITournament }>, res: IRes) {
   const { tournament } = req.body;
 
   if (tournament.avatar !== undefined) {
@@ -99,12 +99,12 @@ async function update(req: IReq<{tournament: ITournament}>, res: IRes) {
 /**
  * Update tournament status.
  */
-async function updateStatus(req: IReq<{status: number}>, res: IRes) {
+async function updateStatus(req: IReq<{ status: number }>, res: IRes) {
   const { status } = req.body;
 
   if (status > 2 || status < 0) {
     return res.status(HttpStatusCodes.BAD_REQUEST).end();
-  } 
+  }
 
   await TournamentService.updateStatus(+req.params.id, status);
   return res.status(HttpStatusCodes.OK).end();
