@@ -129,7 +129,7 @@ async function getTeams(id: number): Promise<ITeam[]> {
 }
 
 async function getAllByUser(id: number): Promise<ITournament[]> {
-  let sql = 'SELECT * FROM tournaments WHERE admin = $1';
+  let sql = 'SELECT t.* FROM tournaments t JOIN tournaments_teams as tt ON tt.tournament = t.id JOIN teams as tm ON tt.team = tm.id JOIN requests r ON r.team_id = tm.id WHERE t.admin = $1 OR (r.user_id = $1 AND r.status = 1)';
   let rows = await DB.query(sql, [id]);
   const tournaments = <ITournament[]>rows;
   
