@@ -1,6 +1,7 @@
 import { IGame } from '@src/models/Game';
-import { IMatch } from '@src/models/Match';
+import { IMatch, VetoStatus } from '@src/models/Match';
 import { ITeam } from '@src/models/Team';
+import app from '@src/server';
 import DB from './DB';
 
 // **** Functions **** //
@@ -116,6 +117,38 @@ async function add(match: IMatch): Promise<void> {
   await DB.query(sql, values);
 }
 
+async function addGames(id: number, veto: VetoStatus) {
+  const sql = 'SELECT * from matches WHERE id = $1';
+  const match = <IMatch>(await DB.query(sql, [id]))[0];
+  let manager_match = await app.locals.jsonStorage.select("match", match.manager_id);
+
+  if (match.type == 0) {
+    await app.locals.manager.update.matchChildCount('match', manager_match.id, 1);
+    const sql_game = 'INSERT INTO games (status, map, team_one_score, team_two_score, match) VALUES ($1, $2, $3, $4, $5)';
+    let values = [0, veto.finalMap, 0, 0, id];
+    
+    await DB.query(sql_game, values);
+  } else {
+    await app.locals.manager.update.matchChildCount('match', manager_match.id, 3);
+    const sql_game = 'INSERT INTO games (status, map, team_one_score, team_two_score, match) VALUES ($1, $2, $3, $4, $5)';
+    let values = [0, veto.team1Picks[0], 0, 0, id];
+    
+    await DB.query(sql_game, values);
+    
+    values = [0, veto.team2Picks[0], 0, 0, id];
+    
+    await DB.query(sql_game, values);
+    
+    values = [0, veto.finalMap!, 0, 0, id];
+    
+    await DB.query(sql_game, values);
+  }
+
+  const update_match_sql = 'UPDATE matches SET status = 1 WHERE id = $1';
+
+  await DB.query(update_match_sql, [id])
+}
+
 /**
  * Update a match.
  */
@@ -141,6 +174,7 @@ export default {
   getAll,
   persists,
   add,
+  addGames,
   update,
   delete: delete_,
 } as const;

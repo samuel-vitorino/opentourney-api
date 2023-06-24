@@ -11,6 +11,18 @@ enum MatchType {
     BO3
 }
 
+export interface VetoStatus {
+  status: number;
+  matchType: number;
+  maps: string[];
+  team1Bans: string[];
+  team2Bans: string[];
+  team1Picks: string[];
+  team2Picks: string[];
+  finalized: boolean;
+  finalMap: string | null;
+}
+
 // **** Types **** //
 
 export interface IMatch {

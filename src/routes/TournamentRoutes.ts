@@ -89,7 +89,6 @@ async function add(req: IReq<{tournament: ITournament}>, res: IRes) {
         return res.status(500).send('An error occurred while saving the image.');
       }
       console.log('Image saved successfully.');
-      return res.status(200).send('Image saved successfully.');
     });
 
     tournament.avatar = filename;
@@ -124,7 +123,6 @@ async function update(req: IReq<{tournament: ITournament}>, res: IRes) {
         return res.status(500).send('An error occurred while saving the image.');
       }
       console.log('Image saved successfully.');
-      return res.status(200).send('Image saved successfully.');
     });
 
     tournament.avatar = filename;

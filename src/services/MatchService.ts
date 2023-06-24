@@ -1,5 +1,5 @@
 import MatchRepo from '@src/repos/MatchRepo';
-import { IMatch } from '@src/models/Match';
+import { IMatch, VetoStatus } from '@src/models/Match';
 import { RouteError } from '@src/other/classes';
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
@@ -27,6 +27,10 @@ function getOne(id: number): Promise<IMatch | null> {
  */
 function addOne(game: IMatch): Promise<void> {
   return MatchRepo.add(game);
+}
+
+function addGames(id: number, veto: VetoStatus): Promise<void> {
+  return MatchRepo.addGames(id, veto);
 }
 
 /**
@@ -64,6 +68,7 @@ async function _delete(id: number): Promise<void> {
 
 export default {
   getAll,
+  addGames,
   getOne,
   addOne,
   updateOne,
