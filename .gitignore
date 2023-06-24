@@ -2,5 +2,5 @@
 dist/
 **/**/*.log
 env/*.env
-public/
+public/images/*
 db.json
