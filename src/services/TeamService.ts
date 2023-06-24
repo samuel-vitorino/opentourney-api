@@ -29,6 +29,10 @@ function getOne(id: number): Promise<ITeam | null> {
 /**
  * Get All Teams By User
  */
+function getAllByOwner(id: number): Promise<ITeam[]> {
+  return TeamRepo.getAllByOwnerId(id);
+}
+
 function getAllByUser(id: number): Promise<ITeam[]> {
   return TeamRepo.getAllByUserId(id);
 }
@@ -69,6 +73,7 @@ async function _delete(id: number): Promise<void> {
 export default {
   getAll,
   getOne,
+  getAllByOwner,
   getAllByUser,
   addOne,
   updateOne,

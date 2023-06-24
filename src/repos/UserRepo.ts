@@ -1,6 +1,7 @@
 import { IUser } from "@src/models/User";
 import PwdUtil from "@src/util/PwdUtil";
 import DB from "./DB";
+import { log } from "console";
 
 // **** Functions **** //
 
@@ -77,11 +78,21 @@ async function add(user: IUser): Promise<void> {
 /**
  * Update a user.
  */
-async function update(user: IUser): Promise<void> {
+async function update(user: IUser): Promise<IUser> {
+  user.pwd = await PwdUtil.getHash(user.pwd!);
+
   const sql =
-    "UPDATE users SET name = $1, email = $2, pwd = $3, role = $4 WHERE id = $5";
-  const values = [user.name, user.email, user.pwd, user.role, user.id];
-  await DB.query(sql, values);
+    "UPDATE users SET name = $1, email = $2, pwd = $3, role = $4, avatar = $5 WHERE id = $6 RETURNING name, email";
+  const values = [
+    user.name,
+    user.email,
+    user.pwd,
+    user.role,
+    user.avatar,
+    user.id,
+  ];
+  const rows = await DB.query(sql, values);
+  return <IUser>rows[0];
 }
 
 /**
