@@ -38,7 +38,8 @@ const Paths = {
   },
   Matches: {
     Base: '/matches',
-    GetOne: '/matches/:id'
+    Logs: '/matches/logs',
+    GetOne: '/matches/:id',
   },
 };
 

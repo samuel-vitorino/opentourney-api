@@ -2,9 +2,10 @@ exports.up = pgm => {
     pgm.createTable('matches', {
         id: 'id',
         manager_id: { type: 'smallint', notNull: true, default: 0 },
+        connect_ip: { type: 'varchar(1000)' },
         status: { type: 'smallint', default: 0 },
         type: { type: 'smallint', notNull: true, default: 0 },
-        currentGame: { type: 'smallint', notNull: true, default: 0 },
+        current_game: { type: 'smallint', notNull: true, default: 0 },
         tournament: {
             type: 'integer',
             notNull: true,

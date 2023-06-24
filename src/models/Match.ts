@@ -11,12 +11,32 @@ enum MatchType {
     BO3
 }
 
+export interface LogEvent {
+  event: string,
+  matchid: string,
+  winner: {team: string, side: string},
+  team1_series_score: number,
+  team2_series_score: number,
+}
+
+export interface VetoStatus {
+  status: number;
+  matchType: number;
+  maps: string[];
+  team1Bans: string[];
+  team2Bans: string[];
+  team1Picks: string[];
+  team2Picks: string[];
+  finalized: boolean;
+  finalMap: string | null;
+}
+
 // **** Types **** //
 
 export interface IMatch {
   id: number;
   type: MatchType;
-  currentGame: number;
+  current_game: number;
   tournament: number;
   team_one: number;
   status: number;
@@ -26,6 +46,7 @@ export interface IMatch {
   teams?: ITeam[];
   games: IGame[];
   manager_id?:  number;
+  connect_ip?: string;
 }
 
 // **** Functions **** //
@@ -35,7 +56,7 @@ export interface IMatch {
  */
 function new_(
   type: MatchType,
-  currentGame: number,
+  current_game: number,
   tournament: number,
   team_one: number,
   team_two: number,
@@ -44,13 +65,14 @@ function new_(
   manager_id?: number,
   team_one_name?: string,
   team_two_name?: string,
+  connect_ip?: string,
   teams?: ITeam[],
   id?: number, // id last cause usually set by db
 ): IMatch {
   return {
     id: (id ?? -1),
     type: type,
-    currentGame: currentGame,
+    current_game: current_game,
     tournament: tournament,
     team_one: team_one,
     team_two: team_two,
@@ -59,6 +81,7 @@ function new_(
     manager_id: manager_id,
     team_one_name: team_one_name,
     team_two_name: team_two_name,
+    connect_ip: connect_ip,
     teams: teams,
   };
 }
@@ -73,7 +96,7 @@ function from(param: object): IMatch {
   }
   // Get game instance
   const p = param as IMatch;
-  return new_(p.type, p.currentGame, p.tournament, p.team_one, p.team_two, p.status, p.games, p.id);
+  return new_(p.type, p.current_game, p.tournament, p.team_one, p.team_two, p.status, p.games, p.id);
 }
 
 /**
