@@ -1,15 +1,16 @@
 // **** Variables **** //
 
+import { log } from "console";
 import { RequestStatus } from "./Request";
 
-const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an ' +
-  'object with the appropriate user keys.';
+const INVALID_CONSTRUCTOR_PARAM =
+  "nameOrObj arg must a string or an " +
+  "object with the appropriate user keys.";
 
 export enum UserRoles {
   Standard,
   Developer,
 }
-
 
 // **** Types **** //
 
@@ -28,7 +29,6 @@ export interface ISessionUser {
   id: number;
 }
 
-
 // **** Functions **** //
 
 /**
@@ -42,17 +42,17 @@ function new_(
   avatar?: string,
   steamid?: string,
   status?: number,
-  id?: number, // id last cause usually set by db
+  id?: number // id last cause usually set by db
 ): IUser {
   return {
-    id: (id ?? -1),
-    name: (name ?? ''),
-    email: (email ?? ''),
-    role: (role ?? UserRoles.Standard),
-    pwd: (pwd ?? ''),
-    avatar: (avatar ?? ''),
-    steamid: (steamid ?? ''),
-    status: (status ?? RequestStatus.PENDING)
+    id: id ?? -1,
+    name: name ?? "",
+    email: email ?? "",
+    role: role ?? UserRoles.Standard,
+    pwd: pwd ?? "",
+    avatar: avatar ?? "",
+    steamid: steamid ?? "",
+    status: status ?? RequestStatus.PENDING,
   };
 }
 
@@ -75,11 +75,11 @@ function from(param: object): IUser {
 function isUser(arg: unknown): boolean {
   return (
     !!arg &&
-    typeof arg === 'object' &&
-    'id' in arg &&
-    'email' in arg &&
-    'name' in arg &&
-    'role' in arg
+    typeof arg === "object" &&
+    "id" in arg &&
+    "email" in arg &&
+    "name" in arg &&
+    "role" in arg
   );
 }
 
@@ -89,14 +89,13 @@ function isUser(arg: unknown): boolean {
 function isUserRegister(arg: unknown): boolean {
   return (
     !!arg &&
-    typeof arg === 'object' &&
-    'email' in arg &&
-    'name' in arg &&
-    'role' in arg &&
-    'pwd' in arg
+    typeof arg === "object" &&
+    "email" in arg &&
+    "name" in arg &&
+    "role" in arg &&
+    "pwd" in arg
   );
 }
-
 
 // **** Export default **** //
 

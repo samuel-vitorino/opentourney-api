@@ -2,5 +2,5 @@
 dist/
 **/**/*.log
 env/*.env
-public/
+public/images/!.gitkeep
 db.json

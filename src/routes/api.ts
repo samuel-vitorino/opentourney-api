@@ -120,7 +120,7 @@ tournamentRouter.get(
 
 tournamentRouter.get(
   Paths.Tournaments.GetMatches,
-  TournamentRoutes.getMatches ,
+  TournamentRoutes.getMatches,
 );
 
 tournamentRouter.post(
@@ -234,9 +234,25 @@ const matchRouter = Router();
 //  GameRoutes.getAll,
 //);
 
-matchRouter.get(Paths.Matches.GetOne, MatchRoutes.getOne);
+matchRouter.get(
+  Paths.Matches.GetOne,
+  MatchRoutes.getOne
+);
 
-matchRouter.get(Paths.Matches.GetAll, MatchRoutes.getAll);
+matchRouter.post(
+  Paths.Matches.Logs, 
+  MatchRoutes.parseLogs
+);
+
+matchRouter.post(
+  Paths.Matches.GetOne, 
+  MatchRoutes.addGames
+);
+
+matchRouter.get(
+  Paths.Matches.Base, 
+  MatchRoutes.getAll
+);
 
 // Add MatchRouter
 apiRouter.use(matchRouter);
