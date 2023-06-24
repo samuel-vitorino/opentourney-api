@@ -341,7 +341,7 @@ async function updateStatus(id: number, status: number): Promise<void> {
       let m = matches[i] as Match;
       let match = {
         type: type == "round_robin" ? 0 : 1,
-        currentGame: 0,
+        current_game: 0,
         tournament: id,
         team_one: idToTeamId[m.opponent1.id],
         team_two: idToTeamId[m.opponent2.id],

@@ -236,6 +236,8 @@ const matchRouter = Router();
 
 matchRouter.get(Paths.Matches.GetOne, MatchRoutes.getOne);
 
+matchRouter.post(Paths.Matches.Logs, MatchRoutes.parseLogs);
+
 matchRouter.post(Paths.Matches.GetOne, MatchRoutes.addGames);
 
 matchRouter.get(Paths.Matches.Base, MatchRoutes.getAll);

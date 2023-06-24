@@ -11,9 +11,9 @@ export interface IGame {
   match: number;
   team_one_score?: number;
   team_two_score?: number;
-  connect_ip?: string;
   map?: string;
   manager_id?: number;
+  order: number;
 }
 
 // **** Functions **** //
@@ -24,9 +24,9 @@ export interface IGame {
 function new_(
   status: number,
   match: number,
+  order: number,
   team_one_score?: number,
   team_two_score?: number,
-  connect_ip?: string,
   map?: string,
   manager_id?: number,
   id?: number, // id last cause usually set by db
@@ -37,7 +37,7 @@ function new_(
     match: match,
     team_one_score: (team_one_score ?? 0),
     team_two_score: (team_two_score ?? 0),
-    connect_ip: (connect_ip ?? ''),
+    order: order,
     map: (map ?? ''),
     manager_id: manager_id
   };
@@ -53,7 +53,7 @@ function from(param: object): IGame {
   }
   // Get game instance
   const p = param as IGame;
-  return new_(p.status, p.match, p.team_one_score, p.team_two_score, p.connect_ip, p.map, p.id);
+  return new_(p.status, p.match, p.order, p.team_one_score, p.team_two_score, p.map, p.id);
 }
 
 /**

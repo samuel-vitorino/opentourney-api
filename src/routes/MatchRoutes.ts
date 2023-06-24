@@ -1,7 +1,7 @@
 import HttpStatusCodes from '@src/constants/HttpStatusCodes';
 
 import MatchService from '@src/services/MatchService';
-import { IMatch, VetoStatus } from '@src/models/Match';
+import { IMatch, LogEvent, VetoStatus } from '@src/models/Match';
 import { IReq, IRes } from './types/express/misc';
 
 // **** Functions **** //
@@ -12,6 +12,12 @@ import { IReq, IRes } from './types/express/misc';
 async function getAll(_: IReq, res: IRes) {
   const matches = await MatchService.getAll();
   return res.status(HttpStatusCodes.OK).json({ matches });
+}
+
+async function parseLogs(req: IReq<LogEvent>, res: IRes) {
+  const log = req.body;
+  await MatchService.parseLogs(log);
+  return res.status(HttpStatusCodes.OK).end();
 }
 
 async function getOne(req: IReq, res: IRes) {
@@ -62,6 +68,7 @@ async function delete_(req: IReq, res: IRes) {
 export default {
   getAll,
   getOne,
+  parseLogs,
   addGames,
   add,
   update,
