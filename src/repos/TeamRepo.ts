@@ -1,6 +1,7 @@
 import { ITeam } from "@src/models/Team";
 import DB from "./DB";
-import Request from "@src/models/Request";
+import Request, { RequestStatus } from "@src/models/Request";
+import { log } from "console";
 
 // **** Functions **** //
 
@@ -56,7 +57,7 @@ async function getOneById(id: number): Promise<ITeam | null> {
     }
   }
 
-  return <ITeam>rows[0];
+  return teams[0];
 }
 
 /**
@@ -109,39 +110,74 @@ export const getAll = async (): Promise<ITeam[]> => {
   return teams;
 };
 
-// // Get one team by their user id.
-// async function getOneByUserId(id: number): Promise<ITeam | null> {
-//   const sql = 'SELECT * FROM teams WHERE owner = $1';
-//   const rows = await DB.query(sql, [id]);
-
-//   if (rows.length === 0) {
-//     return null;
-//   }
-
-//   return <ITeam>rows[0];
-// }
-
-// /**
-//  * Gett all teams by user id, being the owner the name of the user.
-//  */
-// async function getAllByUserId(id: number): Promise<ITeam[]> {
-//   const sql = "SELECT * FROM teams WHERE owner = $1";
-//   const rows = await DB.query(sql, [id]);
-//   return <ITeam[]>rows;
-// }
-
 /**
- * Get all teams by user id, being the owner the name of the user.
- */
-// async function getAllByUserId(id: number): Promise<ITeam[]> {
-//   const sql =
-//     "SELECT teams.*, users.name AS ownerName FROM teams JOIN users ON teams.owner = users.id WHERE users.id = $1";
-//   const rows = await DB.query(sql, [id]);
-
-//   return <ITeam[]>rows;
-// }
-
+ * Get all teams by user id.
+ * @param id
+ **/
 export const getAllByUserId = async (id: number): Promise<ITeam[]> => {
+  const sql = `
+  SELECT
+  t.id,
+  t.name,
+  t.avatar,
+  u1.id as owner_id,
+  u1.name as owner_name,
+  u1.avatar as owner_avatar,
+  u1.email as owner_email,
+  u2.id as member_id,
+  u2.name as member_name,
+  u2.avatar as member_avatar,
+  u2.email as member_email,
+  r.status as member_status
+FROM
+  teams t
+  LEFT JOIN users u1 ON t.owner = u1.id
+  LEFT JOIN requests r ON t.id = r.team_id
+  LEFT JOIN users u2 ON r.user_id = u2.id
+WHERE
+  r.status != 2 AND r.team_id IN (SELECT team_id FROM requests WHERE user_id = $1)
+    `;
+  const rows = await DB.query(sql, [id]);
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  log(rows);
+
+  for (const row of rows) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id && row.member_status !== 2) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+        status: row.member_status,
+      });
+    }
+  }
+  return teams;
+};
+
+export const getAllByOwnerId = async (id: number): Promise<ITeam[]> => {
   const sql = `
       SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
       FROM teams t
@@ -200,12 +236,13 @@ async function persists(id: number): Promise<boolean> {
 /**
  * Add one team.
  */
-async function add(team: ITeam): Promise<void> {
+async function add(team: ITeam, isAdmin: boolean = false): Promise<void> {
   //create procedure for doing two requets in one
 
   const transactionClient = await DB.beginTransaction();
 
-  let sql = "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3) RETURNING id";
+  let sql =
+    "INSERT INTO teams (name, owner, avatar) VALUES ($1, $2, $3) RETURNING id";
   let values: any = [team.name, team.owner.id, team.avatar];
   let id = (await DB.queryInTransaction(transactionClient, sql, values))[0].id;
 
@@ -221,9 +258,10 @@ async function add(team: ITeam): Promise<void> {
     // await DB.queryInTransaction(transactionClient, sql, values);
 
     let status = Request.RequestStatus.PENDING;
-    if (member.id === team.owner.id) {
+    if (isAdmin || member.id === team.owner.id) {
       status = Request.RequestStatus.ACCEPTED;
     }
+
     sql = "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, $3)";
     values = [member.id, id, status];
     await DB.queryInTransaction(transactionClient, sql, values);
@@ -235,13 +273,11 @@ async function add(team: ITeam): Promise<void> {
 /**
  * Update a team.
  */
-async function update(team: ITeam): Promise<void> {
-
+async function update(team: ITeam, isAdmin: boolean = false): Promise<void> {
   const sql_team =
     "UPDATE teams SET name = $1, owner = $2, avatar = $3 WHERE id = $4";
   const values_team = [team.name, team.owner.id, team.avatar, team.id];
   await DB.query(sql_team, values_team);
-
 
   // member id list
   let memberIds = team.members?.map((member) => member.id);
@@ -252,7 +288,7 @@ async function update(team: ITeam): Promise<void> {
       params.push(`$` + (index + 2));
     });
     const sql_team_remove_users =
-      "SELECT id FROM requests WHERE team_id = $1 AND user_id NOT IN (" +
+      "SELECT id FROM requests WHERE team_id = $1 AND status != 2 AND user_id NOT IN (" +
       params.join(",") +
       ")";
     const values_team_users = [team.id, ...memberIds!!];
@@ -271,22 +307,29 @@ async function update(team: ITeam): Promise<void> {
     });
     // DB.endTransaction(clientTransaction);
 
-    const sql_another = "SELECT user_id FROM requests WHERE team_id = $1";
+    const sql_another =
+      "SELECT user_id FROM requests WHERE team_id = $1 AND status != 2";
     const values = [team.id];
-    const rows = await DB.queryInTransaction(clientTransaction, sql_another, values);
+    const rows = await DB.queryInTransaction(
+      clientTransaction,
+      sql_another,
+      values
+    );
 
     const newTeamMembers: number[] = memberIds!.filter((element) => {
       return !rows.some((item: any) => item.user_id === element);
     });
 
-
     // clientTransaction = await DB.beginTransaction();
 
-    //TODO fix new team members not being added
     newTeamMembers.forEach(async (id) => {
+      let status = RequestStatus.PENDING;
+      if (isAdmin || id === team.owner.id) {
+        status = RequestStatus.ACCEPTED;
+      }
       const sql_team_users =
-        "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, 0)";
-      const values_team_users = [id, team.id];
+        "INSERT INTO requests (user_id, team_id, status) VALUES ($1, $2, $3)";
+      const values_team_users = [id, team.id, status];
       await DB.queryInTransaction(
         clientTransaction,
         sql_team_users,
@@ -301,9 +344,13 @@ async function update(team: ITeam): Promise<void> {
  * Delete one team.
  */
 async function delete_(id: number): Promise<void> {
-  const sql = "DELETE FROM teams WHERE id = $1";
-  const values = [id];
-  await DB.query(sql, values);
+  const sql_requests = "DELETE FROM requests WHERE team_id = $1";
+  const values_requests = [id];
+  await DB.query(sql_requests, values_requests);
+
+  const sql_teams = "DELETE FROM teams WHERE id = $1";
+  const values_teams = [id];
+  await DB.query(sql_teams, values_teams);
 }
 
 // **** Export default **** //
@@ -311,6 +358,7 @@ async function delete_(id: number): Promise<void> {
 export default {
   getOneById,
   getAll,
+  getAllByOwnerId,
   getAllByUserId,
   persists,
   add,

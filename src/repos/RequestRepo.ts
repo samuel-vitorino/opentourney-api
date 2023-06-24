@@ -24,7 +24,7 @@ async function getOneById(id: number): Promise<IRequest | null> {
  */
 async function getAll(): Promise<IRequest[]> {
     const sql =
-        "SELECT requests.*, users.name AS username, teams.name AS teamname FROM requests JOIN users ON requests.user_id = users.id JOIN teams ON requests.team_id = teams.id ORDER BY requests.createdat DESC";
+        "SELECT requests.*, users.name AS username, teams.name AS teamname FROM requests JOIN users ON requests.user_id = users.id JOIN teams ON requests.team_id = teams.id ORDER BY requests.createdat DESC, id DESC";
     const rows = await DB.query(sql);
 
     return <IRequest[]>rows;
@@ -51,7 +51,7 @@ async function add(request: IRequest): Promise<void> {
 
 async function getAllByUserId(id: number): Promise<IRequest[]> {
     const sql =
-        "SELECT requests.*, users.name AS username, teams.name AS teamname FROM requests JOIN users ON requests.user_id = users.id JOIN teams ON requests.team_id = teams.id WHERE user_id = $1 ORDER BY requests.createdat DESC";
+        "SELECT requests.*, users.name AS username, teams.name AS teamname FROM requests JOIN users ON requests.user_id = users.id JOIN teams ON requests.team_id = teams.id WHERE user_id = $1 ORDER BY requests.createdat DESC, id DESC";
     const rows = await DB.query(sql, [id]);
 
     return <IRequest[]>rows;
