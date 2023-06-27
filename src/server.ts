@@ -61,8 +61,8 @@ app.use(cors({credentials: true, origin: EnvVars.CORS.origins}));
 
 //Passport
 passport.use(new SteamStrategy.Strategy({
-    returnURL: 'http://localhost:3000/api/auth/steam/return',
-    realm: 'http://localhost:3000/',
+    returnURL: `${EnvVars.CORS.origins}/api/auth/steam/return`,
+    realm: EnvVars.CORS.origins,
     apiKey: EnvVars.Steam.ApiKey,
 }, function(identifier: string, profile: Object, done: passport.DoneCallback) {
     done(null, profile);

@@ -91,7 +91,7 @@ async function createDeployment(matchId: number, matchConfig: string) {
                                     }
                                 ]
                             },
-                        ],
+                        ],  
                     },
                 },
             },
