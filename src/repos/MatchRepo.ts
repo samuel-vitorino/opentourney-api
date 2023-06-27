@@ -4,6 +4,7 @@ import { ITeam } from '@src/models/Team';
 import app from '@src/server';
 import DB from './DB';
 import TournamentRepo from './TournamentRepo';
+import k8utils from '../util/k8utils'
 
 // **** Functions **** //
 
@@ -27,7 +28,7 @@ async function getOneById(id: number): Promise<IMatch | null> {
   if (rows.length > 0) {
     match.games = <IGame[]>rows;
   }
-  
+
   sql = `
       SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
       FROM teams t
@@ -37,7 +38,7 @@ async function getOneById(id: number): Promise<IMatch | null> {
       WHERE t.id = $1 OR t.id = $2
     `;
   rows = await DB.query(sql, [match.team_one, match.team_two]);
-  
+
   if (rows.length === 0) {
     return null;
   }
@@ -78,7 +79,7 @@ async function getOneById(id: number): Promise<IMatch | null> {
   }
 
   let final_teams: Array<ITeam> = [];
-  
+
   if (match.team_one != teams[0].id) {
     final_teams[0] = teams[1];
     final_teams[1] = teams[0];
@@ -95,11 +96,11 @@ async function parseLogs(log: LogEvent) {
   if (log.event != "series_end") {
     return;
   }
-  
+
   const sql = "SELECT * from matches WHERE id = $1"
 
   let match = <IMatch>(await DB.query(sql, [parseInt(log.matchid)]))[0];
-  
+
   const currentStage = await app.locals.manager.get.currentStage(match.tournament);
   const beforeRound = await app.locals.manager.get.currentRound(currentStage.id);
 
@@ -112,10 +113,12 @@ async function parseLogs(log: LogEvent) {
       const sql_update_match = "UPDATE matches SET status = 2 WHERE id = $1";
       await DB.query(sql_update_match, [match.id])
 
-      let games = await app.locals.jsonStorage.select("match_game", {parent_id: match.manager_id})
-      
+      k8utils.deleteDeploymentAndService(match.id);
+
+      let games = await app.locals.jsonStorage.select("match_game", { parent_id: match.manager_id })
+
       const sql_game = "UPDATE games SET status = 1, team_one_score = $1, team_two_score = $2 WHERE id = $3";
-      
+
       if (log.team1_series_score == 1) {
         await app.locals.manager.update.matchGame({
           id: games[0].id,
@@ -140,18 +143,19 @@ async function parseLogs(log: LogEvent) {
         if ((previousGame.team_one_score == 1 && log.team1_series_score == 1) || (previousGame.team_two_score == 1 && log.team2_series_score == 1)) {
           const sql_update_match = "UPDATE matches SET status = 2 WHERE id = $1";
           await DB.query(sql_update_match, [match.id]);
+          k8utils.deleteDeploymentAndService(match.id);
         }
       }
 
       if (current_game == 0 || current_game == 1) {
-          const sql_update_match = "UPDATE matches SET current_game = $1 WHERE id = $2";
-          await DB.query(sql_update_match, [++current_game, match.id]);
+        const sql_update_match = "UPDATE matches SET current_game = $1 WHERE id = $2";
+        await DB.query(sql_update_match, [++current_game, match.id]);
       }
 
-      let games = await app.locals.jsonStorage.select("match_game", {parent_id: match.manager_id})
+      let games = await app.locals.jsonStorage.select("match_game", { parent_id: match.manager_id })
 
       const sql_game = "UPDATE games SET status = 1, team_one_score = $1, team_two_score = $2 WHERE id = $3";
-      
+
       if (log.team1_series_score == 1) {
         await app.locals.manager.update.matchGame({
           id: games[game.order].id,
@@ -173,8 +177,8 @@ async function parseLogs(log: LogEvent) {
 
     if (currentRound && currentRound.id != beforeRound.id) {
       const matches = await app.locals.jsonStorage.select('match', { round_id: currentRound.id });
-      
-      const participants = await app.locals.jsonStorage.select('participant', {tournament_id: match.tournament})
+
+      const participants = await app.locals.jsonStorage.select('participant', { tournament_id: match.tournament })
 
       interface Participant {
         name: string;
@@ -250,26 +254,121 @@ async function addGames(id: number, veto: VetoStatus) {
   const match = <IMatch>(await DB.query(sql, [id]))[0];
   let manager_match = await app.locals.jsonStorage.select("match", match.manager_id);
 
+  const sql_teams = `
+    SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
+    FROM teams t
+    LEFT JOIN users u1 ON t.owner = u1.id
+    LEFT JOIN requests r ON t.id = r.team_id
+    LEFT JOIN users u2 ON r.user_id = u2.id
+    WHERE t.id = $1 OR t.id = $2
+  `;
+
+  const rows_teams = await DB.query(sql_teams, [match.team_one, match.team_two]);
+
+  if (rows_teams.length === 0) {
+    return null;
+  }
+
+  const teams: ITeam[] = [];
+  const teamMap = new Map<number, ITeam>();
+
+  for (const row of rows_teams) {
+    const teamId = row.id;
+    let team = teamMap.get(teamId);
+
+    if (!team) {
+      team = {
+        id: teamId,
+        name: row.name,
+        owner: {
+          id: row.owner_id,
+          name: row.owner_name,
+          avatar: row.owner_avatar,
+          email: row.owner_email,
+        },
+        avatar: row.avatar,
+        members: [],
+      };
+      teamMap.set(teamId, team);
+      teams.push(team);
+    }
+
+    if (row.member_id && row.member_status !== 2) {
+      team.members?.push({
+        id: row.member_id,
+        name: row.member_name,
+        avatar: row.member_avatar,
+        email: row.member_email,
+        status: row.member_status,
+      });
+    }
+  }
+
+  let final_teams: Array<ITeam> = [];
+
+  if (match.team_one != teams[0].id) {
+    final_teams[0] = teams[1];
+    final_teams[1] = teams[0];
+  } else {
+    final_teams = teams;
+  }
+
+  let team1_players: {
+    [steamId: string]: string
+  } = {};
+  
+  let team2_players: {
+    [steamId: string]: string
+  } = {};
+
+  final_teams[0].members?.forEach((m) => {
+    if (m.steamid) {
+      team1_players[m.steamid] = m.name;
+    }
+  });
+  
+  final_teams[1].members?.forEach((m) => {
+    if (m.steamid) {
+      team2_players[m.steamid] = m.name;
+    }
+  });
+
   if (match.type == 0) {
     await app.locals.manager.update.matchChildCount('match', manager_match.id, 1);
     const sql_game = 'INSERT INTO games (status, map, team_one_score, team_two_score, "match", "order") VALUES ($1, $2, $3, $4, $5, $6)';
     let values = [0, veto.finalMap, 0, 0, id, 0];
-    
+
     await DB.query(sql_game, values);
+
+    let matchConfig = { "matchid": match.id.toString(), "num_maps": 1, "maplist": [veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": match.team_one_name, "tag": match.team_one_name, "players": team1_players }, "team2": { "name": match.team_two_name, "tag": match.team_two_name, "players": team2_players } };
+
+    const connect_ip = k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
+
+    const sql_update_match_ip = "UPDATE matches SET connect_ip = $1 WHERE id = $2";
+
+    await DB.query(sql_update_match_ip, [connect_ip, match.id]);
   } else {
     await app.locals.manager.update.matchChildCount('match', manager_match.id, 3);
     const sql_game = 'INSERT INTO games (status, map, team_one_score, team_two_score, "match", "order") VALUES ($1, $2, $3, $4, $5, $6)';
     let values = [0, veto.team1Picks[0], 0, 0, id, 0];
-    
+
     await DB.query(sql_game, values);
-    
+
     values = [0, veto.team2Picks[0], 0, 0, id, 1];
-    
+
     await DB.query(sql_game, values);
-    
+
     values = [0, veto.finalMap!, 0, 0, id, 2];
-    
+
     await DB.query(sql_game, values);
+    
+    let matchConfig = { "matchid": match.id.toString(), "num_maps": 3, "maplist": [veto.team1Picks[0], veto.team2Picks[0], veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": match.team_one_name, "tag": match.team_one_name, "players": team1_players }, "team2": { "name": match.team_two_name, "tag": match.team_two_name, "players": team2_players } };
+
+    const connect_ip = k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
+
+    const sql_update_match_ip = "UPDATE matches SET connect_ip = $1 WHERE id = $2";
+
+    await DB.query(sql_update_match_ip, [connect_ip, match.id]);
   }
 
   const update_match_sql = 'UPDATE matches SET status = 1, current_game = 0 WHERE id = $1';

@@ -26,6 +26,8 @@ import { JsonDatabase } from 'brackets-json-db';
 import { BracketsManager } from 'brackets-manager';
 
 
+const gamePorts = [{27015: false}, {27016: false}, {27017: false}, {27018: false}]
+
 const jsonStorage = new JsonDatabase();
 const manager = new BracketsManager(jsonStorage);
 
@@ -35,6 +37,7 @@ const app = express();
 
 app.locals.jsonStorage = jsonStorage;
 app.locals.manager = manager;
+app.locals.ports = gamePorts;
 
 // **** Setup **** //
 
