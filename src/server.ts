@@ -26,7 +26,7 @@ import { JsonDatabase } from 'brackets-json-db';
 import { BracketsManager } from 'brackets-manager';
 
 
-const gamePorts = [{27015: false}, {27016: false}, {27017: false}, {27018: false}]
+const gamePorts = [{30015: false}, {30016: false}, {30017: false}, {30018: false}]
 
 const jsonStorage = new JsonDatabase();
 const manager = new BracketsManager(jsonStorage);

@@ -20,13 +20,7 @@ async function deleteDeployment(matchId: number) {
 async function getClusterIP(){
     await k8sApi.listNode().then(
         (response) => {
-            console.log('listNode');
-            // response.body.items.forEach((item) => {
-            //     console.log(item.status.addresses);
-            //     // console.log(item.status.addresses[0].address);
-            // });
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA", response.body.items[0].status);
-            return response.body.items[0].status?.addresses!![0].address
+            return response.body.items[0].status?.addresses!![2].address
         }
     );
 }
