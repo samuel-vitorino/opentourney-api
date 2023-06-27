@@ -20,7 +20,8 @@ async function deleteDeployment(matchId: number) {
 async function getClusterIP(){
     await k8sApi.listNode().then(
         (response) => {
-            return response.body.items[0].status?.addresses!![2].address
+            console.log("AAAAAAAAAAA",response.body.items[0].status?.addresses);
+            return response.body.items[0].status?.addresses!![2].addressg
         }
     );
 }
@@ -118,7 +119,7 @@ async function createService(matchId: number, port: number): Promise<void> {
     try {
         await k8sApi.createNamespacedService('default', {
             metadata: {
-                name: `${matchId}-service`,
+                name: `game-${matchId}-service`,
             },
             spec: {
                 selector: {
