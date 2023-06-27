@@ -37,7 +37,7 @@ const app = express();
 
 app.locals.jsonStorage = jsonStorage;
 app.locals.manager = manager;
-app.locals.ports = gamePorts;
+app.locals.gamePorts = gamePorts;
 
 // **** Setup **** //
 
