@@ -17,10 +17,10 @@ async function deleteDeployment(matchId: number) {
     }
 }
 
-async function getClusterIP(){
-    await k8sApi.listNode().then(
+async function getClusterIP(): Promise<string>{
+    return await k8sApi.listNode().then(
         (response) => {
-            return response.body.items[0].status?.addresses!![2].address
+            return response.body.items[0].status?.addresses!![2].address!
         }
     );
 }
@@ -110,7 +110,7 @@ async function createDeployment(matchId: number, matchConfig: string): Promise<s
         console.log('[ERROR] Deployment created');
         console.log(err.statusCode, err.body.message);
     }
-    return `${getClusterIP()}:${port}`;
+    return `${await getClusterIP()}:${port}`;
 }
 
 async function createService(matchId: number, port: number): Promise<void> {
