@@ -88,7 +88,7 @@ async function update(req: IReq<{ user: IUser }>, res: IRes) {
     const filename = `${Date.now()}_${user.name}.${imageExtension}`;
 
     // Save the image to the server
-    const imagePath = path.join(__dirname, "../../public/images", filename);
+    const imagePath = path.join(__dirname, "../../public/backend-images", filename);
     fs.writeFile(imagePath, base64Image, { encoding: "base64" }, (err) => {
       if (err) {
         console.log("Error:", err);
