@@ -7,9 +7,6 @@ kc.loadFromCluster();
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 const k8sApps = kc.makeApiClient(k8s.AppsV1Api);
 
-let clusterIP = ""
-k8sApi.listNode().then(res => clusterIP = res.body.items!![0].status?.addresses!![0].address!!)
-
 async function deleteDeployment(matchId: number) {
     try {
         await k8sApps.deleteNamespacedDeployment(`server-${matchId}-deployment`, 'default');
