@@ -266,7 +266,7 @@ async function addGames(id: number, veto: VetoStatus) {
   const rows_teams = await DB.query(sql_teams, [match.team_one, match.team_two]);
 
   if (rows_teams.length === 0) {
-    return null;
+    return;
   }
 
   const teams: ITeam[] = [];

@@ -28,20 +28,20 @@ async function getClusterIP(){
             //     console.log(item.status.addresses);
             //     // console.log(item.status.addresses[0].address);
             // });
-            return response.body.items[2]!!.status?.addresses[0]!!.address
+            return response.body.items[2].status?.addresses!![0].address
         }
     );
 }
 
 async function createDeployment(matchId: number, matchConfig: string) {
-    const port: number;
+    let port: number = 0;
     
     for (let i = 0; i < app.locals.gamePorts.length; i++) {
         const ports = app.locals.gamePorts[i];
 
         for (let p in ports) {
             if (!ports[p]) {
-                port = p;
+                port = parseInt(p);
             }
         }
     }
@@ -87,7 +87,7 @@ async function createDeployment(matchId: number, matchConfig: string) {
                                     {
                                         name: "EVENT_API_URL",
                                         value: "https://broadvision.eu.org/api"
-                                    }
+                                    },
                                     {
                                         name: "SRCDS_PORT",
                                         value: port.toString()
