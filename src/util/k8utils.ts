@@ -82,7 +82,7 @@ async function createDeployment(matchId: number, matchConfig: string): Promise<s
                                     },
                                     {
                                         name: "EVENT_API_URL",
-                                        value: "https://broadvision.eu.org/api"
+                                        value: "https://broadvision.eu.org/api/matches/logs"
                                     },
                                     {
                                         name: "SRCDS_PORT",
