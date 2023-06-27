@@ -22,10 +22,10 @@ async function steamCallback(req: IReq, res: IRes) {
             throw new Error()
         }
         
-        return res.redirect(`http://${EnvVars.CookieProps.Options.domain}/settings`);
+        return res.redirect(`${EnvVars.CORS.origins}/settings`);
 
     } catch (error) {
-        return res.redirect(`http://${EnvVars.CookieProps.Options.domain}/`)
+        return res.redirect(`${EnvVars.CORS.origins}/`)
     }
 }
 
