@@ -59,7 +59,7 @@ async function getAll(): Promise<ITournament[]> {
  * Get matches.
  */
 async function getMatches(id: number): Promise<IMatch[]> {
-  let sql = 'SELECT m.*, t1.name as team_one_name, t2.name as team_two_name FROM matches m LEFT JOIN teams as t1 ON m.team_one = t1.id LEFT JOIN teams as t2 ON m.team_two = t2.id WHERE m.tournament = $1';
+  let sql = 'SELECT m.*, t1.name as team_one_name, t2.name as team_two_name, t1.avatar as team_one_avatar, t2.avatar as team_two_avatar FROM matches m LEFT JOIN teams as t1 ON m.team_one = t1.id LEFT JOIN teams as t2 ON m.team_two = t2.id WHERE m.tournament = $1';
   let rows = <IMatch[]>await DB.query(sql, [id]);
 
   for (let i = 0; i < rows.length; i++) {

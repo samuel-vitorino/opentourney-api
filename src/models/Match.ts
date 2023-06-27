@@ -41,8 +41,10 @@ export interface IMatch {
   team_one: number;
   status: number;
   team_one_name?: string;
+  team_one_avatar?: string;
   team_two: number;
   team_two_name?: string;
+  team_two_avatar?: string;
   teams?: ITeam[];
   games: IGame[];
   manager_id?:  number;
@@ -65,6 +67,8 @@ function new_(
   manager_id?: number,
   team_one_name?: string,
   team_two_name?: string,
+  team_one_avatar?: string,
+  team_two_avatar?: string,
   connect_ip?: string,
   teams?: ITeam[],
   id?: number, // id last cause usually set by db
@@ -81,6 +85,8 @@ function new_(
     manager_id: manager_id,
     team_one_name: team_one_name,
     team_two_name: team_two_name,
+    team_one_avatar: team_one_avatar,
+    team_two_avatar: team_two_avatar,
     connect_ip: connect_ip,
     teams: teams,
   };
