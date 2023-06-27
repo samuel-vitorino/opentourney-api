@@ -25,8 +25,8 @@ async function getClusterIP(){
             //     console.log(item.status.addresses);
             //     // console.log(item.status.addresses[0].address);
             // });
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA", response.body);
-            return response.body.items[2].status?.addresses!![0].address
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA", response.body.items[0].status);
+            return response.body.items[0].status?.addresses!![0].address
         }
     );
 }
@@ -108,9 +108,9 @@ async function createDeployment(matchId: number, matchConfig: string) {
                 },
             },
         })
-            .then((res) => {
+            .then(async (res) => {
                 console.log('Deployment created');
-                createService(matchId, port);
+                await createService(matchId, port);
                 return `${getClusterIP()}:${port}`
             })
     } catch (err) {
@@ -119,7 +119,7 @@ async function createDeployment(matchId: number, matchConfig: string) {
     }
 }
 
-async function createService(matchId: number, port: number) {
+async function createService(matchId: number, port: number): Promise<void> {
     let nodePort: number = 0
     try {
         await k8sApi.createNamespacedService('default', {
