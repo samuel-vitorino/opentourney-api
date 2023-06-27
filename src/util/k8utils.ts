@@ -20,13 +20,12 @@ async function deleteDeployment(matchId: number) {
 async function getClusterIP(){
     await k8sApi.listNode().then(
         (response) => {
-            console.log("AAAAAAAAAAA",response.body.items[0].status?.addresses);
             return response.body.items[0].status?.addresses!![2].address
         }
     );
 }
 
-async function createDeployment(matchId: number, matchConfig: string) {
+async function createDeployment(matchId: number, matchConfig: string): Promise<string> {
     let port: number = 0;
     
     for (let i = 0; i < app.locals.gamePorts.length; i++) {
@@ -106,12 +105,12 @@ async function createDeployment(matchId: number, matchConfig: string) {
             .then(async (res) => {
                 console.log('Deployment created');
                 await createService(matchId, port);
-                return `${getClusterIP()}:${port}`
             })
     } catch (err) {
         console.log('[ERROR] Deployment created');
         console.log(err.statusCode, err.body.message);
     }
+    return `${getClusterIP()}:${port}`;
 }
 
 async function createService(matchId: number, port: number): Promise<void> {

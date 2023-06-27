@@ -343,7 +343,7 @@ async function addGames(id: number, veto: VetoStatus) {
 
     let matchConfig = { "matchid": match.id.toString(), "num_maps": 1, "maplist": [veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": match.team_one_name, "tag": match.team_one_name, "players": team1_players }, "team2": { "name": match.team_two_name, "tag": match.team_two_name, "players": team2_players } };
 
-    const connect_ip = k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
+    const connect_ip = await k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
 
     const sql_update_match_ip = "UPDATE matches SET connect_ip = $1 WHERE id = $2";
 
@@ -365,7 +365,7 @@ async function addGames(id: number, veto: VetoStatus) {
     
     let matchConfig = { "matchid": match.id.toString(), "num_maps": 3, "maplist": [veto.team1Picks[0], veto.team2Picks[0], veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": match.team_one_name, "tag": match.team_one_name, "players": team1_players }, "team2": { "name": match.team_two_name, "tag": match.team_two_name, "players": team2_players } };
 
-    const connect_ip = k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
+    const connect_ip = await k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
 
     const sql_update_match_ip = "UPDATE matches SET connect_ip = $1 WHERE id = $2";
 
