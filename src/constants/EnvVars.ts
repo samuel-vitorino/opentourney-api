@@ -17,7 +17,7 @@ export default {
       signed: true,
       path: (process.env.COOKIE_PATH ?? ''),
       maxAge: Number(process.env.COOKIE_EXP ?? 0),
-      domain: (process.env.COOKIE_DOMAIN ?? ''),
+      //domain: (process.env.COOKIE_DOMAIN ?? ''),
       secure: (process.env.SECURE_COOKIE === 'true'),
     },
   },
