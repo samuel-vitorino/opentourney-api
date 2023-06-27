@@ -255,7 +255,7 @@ async function addGames(id: number, veto: VetoStatus) {
   let manager_match = await app.locals.jsonStorage.select("match", match.manager_id);
 
   const sql_teams = `
-    SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
+    SELECT t.id, t.name, t.avatar, u1.id as owner_id, u1.name as owner_name, u1.avatar as owner_avatar, u1.email as owner_email, u2.id as member_id, u2.name as member_name, u2.steamid as member_steamid, u2.avatar as member_avatar, u2.email as member_email, r.status as member_status
     FROM teams t
     LEFT JOIN users u1 ON t.owner = u1.id
     LEFT JOIN requests r ON t.id = r.team_id
@@ -300,6 +300,7 @@ async function addGames(id: number, veto: VetoStatus) {
         avatar: row.member_avatar,
         email: row.member_email,
         status: row.member_status,
+        steamid: row.member_steamid
       });
     }
   }
