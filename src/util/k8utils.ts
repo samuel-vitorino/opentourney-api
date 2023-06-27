@@ -21,7 +21,7 @@ async function getClusterIP(){
     await k8sApi.listNode().then(
         (response) => {
             console.log("AAAAAAAAAAA",response.body.items[0].status?.addresses);
-            return response.body.items[0].status?.addresses!![2].addressg
+            return response.body.items[0].status?.addresses!![2].address
         }
     );
 }
