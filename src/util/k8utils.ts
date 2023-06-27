@@ -25,6 +25,7 @@ async function getClusterIP(){
             //     console.log(item.status.addresses);
             //     // console.log(item.status.addresses[0].address);
             // });
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA", response.body);
             return response.body.items[2].status?.addresses!![0].address
         }
     );
@@ -66,6 +67,10 @@ async function createDeployment(matchId: number, matchConfig: string) {
                             {
                                 name: `server-${matchId}-container`,
                                 image: 'samuelvitorino/opentourney-server:latest',
+                                volumeMounts: [{
+                                    name: 'game-files-volume',
+                                    mountPath: '/home/steam/csgo-dedicated'
+                                }],
                                 ports: [
                                     {
                                         containerPort: port,
@@ -91,7 +96,14 @@ async function createDeployment(matchId: number, matchConfig: string) {
                                     }
                                 ]
                             },
-                        ],  
+                        ],
+                        volumes: [{
+                            name: 'game-files-volume',
+                            persistentVolumeClaim: {
+                                claimName: 'game-files-pvc', // Name of the persistent volume claim
+                                readOnly: false
+                            }
+                        }]
                     },
                 },
             },
