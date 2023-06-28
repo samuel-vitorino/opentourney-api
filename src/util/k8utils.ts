@@ -130,11 +130,13 @@ async function createService(matchId: number, port: number): Promise<void> {
                 },
                 ports: [
                     {
+                        name: "UDPPort",
                         port: port,
                         nodePort: port,
                         protocol: 'UDP',
                     },
                     {
+                        name: "TCPPort",
                         port: port,
                         nodePort: port,
                         protocol: 'TCP',
