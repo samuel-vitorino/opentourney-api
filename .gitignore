@@ -3,4 +3,4 @@ dist/
 **/**/*.log
 env/*.env
 public/backend-images/!.gitkeep
-db.json
+manager_db/db.json

@@ -28,7 +28,7 @@ import { BracketsManager } from 'brackets-manager';
 
 const gamePorts = [{30015: false}, {30016: false}, {30017: false}, {30018: false}]
 
-const jsonStorage = new JsonDatabase();
+const jsonStorage = new JsonDatabase("manager_db/db.json");
 const manager = new BracketsManager(jsonStorage);
 
 // **** Variables **** //
