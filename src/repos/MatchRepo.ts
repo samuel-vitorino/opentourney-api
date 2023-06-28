@@ -93,7 +93,8 @@ async function getOneById(id: number): Promise<IMatch | null> {
 }
 
 async function parseLogs(log: LogEvent) {
-  if (log.event != "series_end") {
+  console.log(log.event);
+  if (log.event != "map_end") {
     return;
   }
 
@@ -119,20 +120,20 @@ async function parseLogs(log: LogEvent) {
 
       const sql_game = "UPDATE games SET status = 1, team_one_score = $1, team_two_score = $2 WHERE id = $3";
 
-      if (log.team1_series_score == 1) {
+      if (log.winner.team == "team1") {
         await app.locals.manager.update.matchGame({
           id: games[0].id,
-          opponent1: { score: 1, result: 'win' },
-          opponent2: { score: 0 }
+          opponent1: { score: log.team1.score, result: 'win' },
+          opponent2: { score: log.team2.score }
         })
-        await DB.query(sql_game, [1, 0, game.id]);
+        await DB.query(sql_game, [log.team1.score, log.team2.score, game.id]);
       } else {
         await app.locals.manager.update.matchGame({
           id: games[0].id,
-          opponent1: { score: 0 },
-          opponent2: { score: 1, result: 'win' }
+          opponent1: { score: log.team1.score },
+          opponent2: { score: log.team2.score, result: 'win' }
         })
-        await DB.query(sql_game, [0, 1, game.id]);
+        await DB.query(sql_game, [log.team1.score, log.team2.score, game.id]);
       }
     } else {
       if (current_game == 2) {
@@ -140,7 +141,7 @@ async function parseLogs(log: LogEvent) {
         await DB.query(sql_update_match, [match.id]);
       } else if (current_game == 1) {
         let previousGame = <IGame>(await DB.query(sql_games, [match.id, 0]))[0];
-        if ((previousGame.team_one_score == 1 && log.team1_series_score == 1) || (previousGame.team_two_score == 1 && log.team2_series_score == 1)) {
+        if ((previousGame.team_one_score == 16 && log.team2.score == 16) || (previousGame.team_two_score == 16 && log.team2.score == 16)) {
           const sql_update_match = "UPDATE matches SET status = 2 WHERE id = $1";
           await DB.query(sql_update_match, [match.id]);
           k8utils.deleteDeploymentAndService(match.id);
@@ -156,20 +157,21 @@ async function parseLogs(log: LogEvent) {
 
       const sql_game = "UPDATE games SET status = 1, team_one_score = $1, team_two_score = $2 WHERE id = $3";
 
-      if (log.team1_series_score == 1) {
+
+      if (log.winner.team == "team1") {
         await app.locals.manager.update.matchGame({
           id: games[game.order].id,
-          opponent1: { score: 1, result: 'win' },
-          opponent2: { score: 0 }
+          opponent1: { score: log.team1.score, result: 'win' },
+          opponent2: { score: log.team2.score }
         })
-        await DB.query(sql_game, [1, 0, game.id]);
+        await DB.query(sql_game, [log.team1.score, log.team2.score, game.id]);
       } else {
         await app.locals.manager.update.matchGame({
           id: games[game.order].id,
-          opponent1: { score: 0 },
-          opponent2: { score: 1, result: 'win' }
+          opponent1: { score: log.team1.score },
+          opponent2: { score: log.team2.score, result: 'win' }
         })
-        await DB.query(sql_game, [0, 1, game.id]);
+        await DB.query(sql_game, [log.team1.score, log.team2.score, game.id]);
       }
     }
 

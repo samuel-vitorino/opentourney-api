@@ -11,12 +11,16 @@ enum MatchType {
     BO3
 }
 
+export interface LogTeam {
+  score: number;
+}
+
 export interface LogEvent {
   event: string,
   matchid: string,
   winner: {team: string, side: string},
-  team1_series_score: number,
-  team2_series_score: number,
+  team1: LogTeam,
+  team2: LogTeam
 }
 
 export interface VetoStatus {
