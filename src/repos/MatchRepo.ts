@@ -138,6 +138,7 @@ async function parseLogs(log: LogEvent) {
       if (current_game == 2) {
         const sql_update_match = "UPDATE matches SET status = 2 WHERE id = $1";
         await DB.query(sql_update_match, [match.id]);
+        k8utils.deleteDeploymentAndService(match.id);
       } else if (current_game == 1) {
         let previousGame = <IGame>(await DB.query(sql_games, [match.id, 0]))[0];
         if ((previousGame.team_one_score == 16 && log.team2.score == 16) || (previousGame.team_two_score == 16 && log.team2.score == 16)) {

@@ -70,6 +70,10 @@ async function createDeployment(matchId: number, matchConfig: string): Promise<s
                                         containerPort: port,
                                         protocol: 'UDP'
                                     },
+                                    {
+                                        containerPort: port,
+                                        protocol: 'TCP'
+                                    },
                                 ],
                                 env: [
                                     {
@@ -126,10 +130,17 @@ async function createService(matchId: number, port: number): Promise<void> {
                 },
                 ports: [
                     {
+                        name: 'udp-port',
                         port: port,
                         nodePort: port,
                         protocol: 'UDP',
                     },
+                    {
+                        name: 'tcp-port',
+                        port: port,
+                        nodePort: port,
+                        protocol: 'TCP',
+                    }
                 ],
                 type: 'NodePort',
             },
