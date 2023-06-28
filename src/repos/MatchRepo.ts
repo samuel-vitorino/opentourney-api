@@ -93,8 +93,7 @@ async function getOneById(id: number): Promise<IMatch | null> {
 }
 
 async function parseLogs(log: LogEvent) {
-  console.log(log.event);
-  if (log.event != "map_end") {
+  if (log.event != "map_result") {
     return;
   }
 
@@ -343,7 +342,7 @@ async function addGames(id: number, veto: VetoStatus) {
 
     await DB.query(sql_game, values);
 
-    let matchConfig = { "matchid": match.id.toString(), "num_maps": 1, "maplist": [veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": final_teams[0].name, "tag": final_teams[0].name, "players": team1_players }, "team2": { "name": final_teams[1].name, "tag": final_teams[1].name, "players": team2_players } };
+    let matchConfig = { "matchid": match.id.toString(), "num_maps": 1, "wingman": false, "maplist": [veto.finalMap], "skip_veto": true, "map_sides": ["knife"], "team1": { "name": final_teams[0].name, "tag": final_teams[0].name, "players": team1_players }, "team2": { "name": final_teams[1].name, "tag": final_teams[1].name, "players": team2_players } };
 
     const connect_ip = await k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
 
@@ -365,7 +364,7 @@ async function addGames(id: number, veto: VetoStatus) {
 
     await DB.query(sql_game, values);
     
-    let matchConfig = { "matchid": match.id.toString(), "num_maps": 3, "maplist": [veto.team1Picks[0], veto.team2Picks[0], veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": final_teams[0].name, "tag": final_teams[0].name, "players": team1_players }, "team2": { "name": final_teams[1].name, "tag": final_teams[1].name, "players": team2_players } };
+    let matchConfig = { "matchid": match.id.toString(), "num_maps": 3, "wingman": false, "maplist": [veto.team1Picks[0], veto.team2Picks[0], veto.finalMap], "skip_veto": true, "map_sides": ["team1_ct", "team2_ct", "knife"], "team1": { "name": final_teams[0].name, "tag": final_teams[0].name, "players": team1_players }, "team2": { "name": final_teams[1].name, "tag": final_teams[1].name, "players": team2_players } };
 
     const connect_ip = await k8utils.createDeployment(match.id, JSON.stringify(matchConfig));
 
