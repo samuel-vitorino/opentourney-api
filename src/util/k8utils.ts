@@ -122,7 +122,7 @@ async function createService(matchId: number, port: number): Promise<void> {
     try {
         await k8sApi.createNamespacedService('default', {
             metadata: {
-                name: `game-${matchId}-service`,
+                name: `server-${matchId}-service`,
             },
             spec: {
                 selector: {
@@ -160,7 +160,7 @@ async function createService(matchId: number, port: number): Promise<void> {
 
 async function deleteService(matchId: number) {
     try {
-        await k8sApi.deleteNamespacedService(`${matchId}-service`, 'default');
+        await k8sApi.deleteNamespacedService(`server-${matchId}-service`, 'default');
         console.log('Service Deleted');
     } catch (err) {
         console.log('[ERROR] Service Deleted');
